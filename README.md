@@ -45,8 +45,11 @@ src/
 Everything is currently **front-end / mock**:
 
 - Forms persist to the browser locally so you can demo the flow — no real backend, payments, or email yet.
-- Streaming links, socials and ticket buttons are placeholders — wire them to real URLs when ready.
-- Suggested next steps: pick the tour/release data to show, decide Inner Circle pricing/perks, and confirm whether merch launches as real commerce or notify-only.
+- **Spotify playback** uses the official embed player. Each release in `src/store.jsx` has a `spotify` field — fill it with the track ID (the part after `/track/` in a Spotify share link) and the player docks the real Spotify player instead of the "Listen on Spotify" link-out.
+- **Tour** dates are placeholders awaiting the real schedule (in `SEED.tour`, `src/store.jsx`).
+- **Merch** is hidden on the public site until products are live — re-enable `<MerchSection />` in `src/PublicSite.jsx` when ready.
+- Socials and ticket buttons are placeholders — wire them to real URLs when ready.
+- Suggested next steps: add the Spotify track IDs, drop in the real tour dates, and decide Inner Circle pricing/perks.
 
 To go live, the natural next layer is a backend (e.g. an API + database) behind the existing store interface in `src/store.jsx`, plus real auth on the admin view.
 

@@ -57,7 +57,6 @@ function Nav({ active, onAdmin, playing }) {
             ))}
           </div>
           <div className="nav-right">
-            <a className="nav-admin" href="#" onClick={(e) => { e.preventDefault(); onAdmin(); }}><Icon name="grid" size={14} /> Admin</a>
             <button className="btn btn-fill" onClick={() => go("join")}>Join</button>
             <button className="nav-burger pill" onClick={() => setOpen(true)} aria-label="Menu"><Icon name="menu" size={18} /></button>
           </div>
@@ -71,7 +70,6 @@ function Nav({ active, onAdmin, playing }) {
         {NAVLINKS.concat([["Join", "join"]]).map(([l, id]) => (
           <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }}>{l} <Icon name="arrowUR" size={22} /></a>
         ))}
-        <a href="#" onClick={(e) => { e.preventDefault(); setOpen(false); onAdmin(); }}>Admin <Icon name="grid" size={20} /></a>
       </div>
     </>
   );
@@ -84,11 +82,6 @@ function Hero({ onPlay, playing, heroImg }) {
       <div className="hero-bg"><img src={heroImg || A.blue} alt="Vanco" /></div>
       <img className="hero-mono" src={A.monoW} alt="" aria-hidden="true" />
       <div className="hero-in">
-        <div className="hero-kick kicker">
-          <span>Afro House</span><span className="dotsep" />
-          <span>Melodic Techno</span><span className="dotsep" />
-          <span>Johannesburg → World</span>
-        </div>
         <h1>Rhythm<br />without<br /><span className="o">borders</span></h1>
         <p className="hero-sub">DJ and producer blending Afro house, melodic techno and tribal electronic rhythms — rooted in African spirit, designed for every dancefloor on earth.</p>
         <div className="hero-cta">
@@ -97,13 +90,10 @@ function Hero({ onPlay, playing, heroImg }) {
           </button>
           <button className="np" onClick={() => onPlay(SEED.releases[0])}>
             <span className="pp"><Icon name={playing && playing.id === "r1" ? "pause" : "play"} size={14} /></span>
-            <span className="meta">Now spinning · <b>Ma Tnsani</b> feat. Aya</span>
+            <span className="meta">Now playing · <b>Ma Tnsani</b> feat. Aya</span>
             <span className="eqbars"><i /><i /><i /><i /></span>
           </button>
         </div>
-      </div>
-      <div className="hero-foot">
-        <span>80M+ Streams</span><span>·</span><span>#1 Shazam · Ibiza ’25</span><span>·</span><span>Scroll ↓</span>
       </div>
     </header>
   );
@@ -491,7 +481,6 @@ function Footer({ onAdmin }) {
           <div className="foot-col">
             <h5>Explore</h5>
             {NAVLINKS.map(([l, id]) => <a key={id} href={`#${id}`} onClick={(e) => { e.preventDefault(); go(id); }}>{l}</a>)}
-            <a href="#merch" onClick={(e) => { e.preventDefault(); go("merch"); }}>Merch</a>
           </div>
           <div className="foot-col">
             <h5>Connect</h5>
@@ -525,23 +514,49 @@ function Footer({ onAdmin }) {
 }
 
 /* ---------- PLAYER BAR ---------- */
-function PlayerBar({ track, onToggle, onClose }) {
-  const [prog, setProg] = useState(18);
-  useEffect(() => { setProg(8); const t = setInterval(() => setProg((p) => (p >= 100 ? 8 : p + 0.4)), 200); return () => clearInterval(t); }, [track?.id]);
+// Fallback link when a track has no Spotify ID yet — opens it on Spotify.
+const spotifySearch = (t) => `https://open.spotify.com/search/${encodeURIComponent(`Vanco ${t.title}`)}`;
+
+function PlayerBar({ track, onClose }) {
+  const [prog, setProg] = useState(8);
+  const hasEmbed = !!track?.spotify;
+  useEffect(() => {
+    if (!track || hasEmbed) return;
+    setProg(8);
+    const t = setInterval(() => setProg((p) => (p >= 100 ? 8 : p + 0.4)), 200);
+    return () => clearInterval(t);
+  }, [track?.id, hasEmbed]);
   if (!track) return null;
+
+  // Real audio: official Spotify embed (full track if the visitor is signed into
+  // Spotify, 30s preview otherwise). Driven by the track's `spotify` ID.
+  if (hasEmbed) {
+    return (
+      <div className="playerbar spotify">
+        <iframe
+          title={`${track.title} on Spotify`}
+          src={`https://open.spotify.com/embed/track/${track.spotify}?utm_source=generator&theme=0`}
+          width="100%" height="80" frameBorder="0" loading="lazy"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+        />
+        <button className="pb-x pb-x-embed" onClick={onClose} aria-label="Close"><Icon name="x" size={16} /></button>
+      </div>
+    );
+  }
+
+  // Fallback until the track's Spotify ID is wired in.
   return (
     <div className="playerbar">
       <div className="pb-prog"><span style={{ width: `${prog}%` }} /></div>
       <div className="pb-in">
-        <button className="pb-pp" onClick={onToggle}><Icon name="pause" size={16} /></button>
+        <a className="pb-pp" href={spotifySearch(track)} target="_blank" rel="noreferrer" aria-label="Play on Spotify"><Icon name="play" size={16} /></a>
         <div className="pb-meta">
           <div className="pb-t">{track.title}</div>
           <div className="pb-f">{track.feat}</div>
         </div>
         <span className="eqbars" style={{ height: 16 }}><i /><i /><i /><i /></span>
-        <div className="pb-links">
-          {PLATFORMS.slice(0, 4).map((p) => <a key={p.key} href="#" onClick={(e) => e.preventDefault()} title={p.label}><Icon name={p.icon} size={17} /></a>)}
-        </div>
+        <a className="pb-spotify" href={spotifySearch(track)} target="_blank" rel="noreferrer"><Icon name="spotify" size={17} /> Listen on Spotify</a>
         <div className="pb-time mono">{track.len}</div>
         <button className="pb-x" onClick={onClose} aria-label="Close"><Icon name="x" size={16} /></button>
       </div>
@@ -573,9 +588,9 @@ export function PublicSite({ onAdmin, heroImg }) {
       <SubmitSection />
       <BookSection />
       <JoinSection />
-      <MerchSection />
+      {/* Merch hidden until products are live — re-enable <MerchSection /> when ready. */}
       <Footer onAdmin={onAdmin} />
-      <PlayerBar track={playing} onToggle={() => setPlaying(null)} onClose={() => setPlaying(null)} />
+      <PlayerBar track={playing} onClose={() => setPlaying(null)} />
     </div>
   );
 }
