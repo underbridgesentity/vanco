@@ -64,23 +64,22 @@ export const PLATFORMS = [
   { key: "youtube", label: "YouTube", icon: "youtube" },
 ];
 
-/* Vanco's Spotify artist page — used for "follow / listen" links.
-   TODO: replace with the real artist URL. */
-export const SPOTIFY_ARTIST = "https://open.spotify.com/search/Vanco";
+/* Vanco's real Spotify identity. The site feeds from his artist profile via the
+   official Spotify embed, so the catalogue always reflects what's live on Spotify
+   (latest releases + popular tracks) — no hardcoded track lists to go stale. */
+export const SPOTIFY = {
+  artistId: "2KShewLkb92FKEZ6N4cVP9",
+  artistUrl: "https://open.spotify.com/artist/2KShewLkb92FKEZ6N4cVP9",
+  // Signature single surfaced by the hero "Play latest" CTA. Update if a newer
+  // flagship release should lead.
+  featuredTrackId: "01WFjqzUwrD4nfSQsHMVNm",
+  featuredTitle: "Ma Tnsani (Yalla Habibi)",
+  featuredFeat: "feat. AYA",
+};
 
 /* ---------- seed data ---------- */
 export const SEED = {
-  // `spotify` holds the Spotify TRACK ID (the part after /track/ in a share link).
-  // Fill these in to enable real in-page Spotify playback; until then the player
-  // falls back to a "Listen on Spotify" link-out.
-  releases: [
-    { id: "r1", title: "Ma Tnsani", feat: "Aya", year: "2025", type: "Single", label: "ALGRA / Afro Republik", streams: "80.4M", hot: true, len: "6:18", note: "#1 most Shazammed track — Ibiza 2025", color: "#2347ff", spotify: "" },
-    { id: "r2", title: "Borders", feat: "DEELA", year: "2026", type: "Single", label: "Afro Republik", streams: "2.1M", fresh: true, len: "7:02", note: "New — gaining traction on the floor", color: "#c8102e", spotify: "" },
-    { id: "r3", title: "Water", feat: "Tyla — Vanco Remix", year: "2025", type: "Remix", label: "Epic / FAX", streams: "14.7M", len: "5:44", color: "#1f9d6b", spotify: "" },
-    { id: "r4", title: "Dark Days", feat: "Moby — Vanco Remix", year: "2024", type: "Remix", label: "Mute", streams: "5.9M", len: "6:40", color: "#6b4fff", spotify: "" },
-    { id: "r5", title: "Bailar Contigo", feat: "Black Eyed Peas & Daddy Yankee — Vanco Remix", year: "2024", type: "Remix", label: "Epic", streams: "9.2M", len: "5:12", color: "#ff7a00", spotify: "" },
-    { id: "r6", title: "Sondela", feat: "Una Rams", year: "2024", type: "Single", label: "Sondela", streams: "6.4M", len: "6:55", color: "#0aa3a3", spotify: "" },
-  ],
+  // No hardcoded discography — the Music section pulls live from Spotify (see SPOTIFY).
   tour: [
     { id: "t1", date: "2026-06-14", city: "Ibiza", country: "ES", venue: "Ushuaïa", region: "Europe", status: "Tickets" },
     { id: "t2", date: "2026-06-21", city: "Ibiza", country: "ES", venue: "Blue Marlin", region: "Europe", status: "Tickets" },

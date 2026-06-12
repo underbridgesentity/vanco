@@ -42,14 +42,20 @@ src/
 
 ## Status & next steps
 
-Everything is currently **front-end / mock**:
-
-- Forms persist to the browser locally so you can demo the flow — no real backend, payments, or email yet.
-- **Spotify playback** uses the official embed player. Each release in `src/store.jsx` has a `spotify` field — fill it with the track ID (the part after `/track/` in a Spotify share link) and the player docks the real Spotify player instead of the "Listen on Spotify" link-out.
-- **Tour** dates are placeholders awaiting the real schedule (in `SEED.tour`, `src/store.jsx`).
-- **Merch** is hidden on the public site until products are live — re-enable `<MerchSection />` in `src/PublicSite.jsx` when ready.
+- **Music** feeds live from Vanco's real Spotify artist profile via the official
+  Spotify embed (`SPOTIFY` in `src/store.jsx`), so the catalogue always reflects
+  what's current on Spotify — latest releases and top tracks — and plays in-page
+  (full track if the visitor is signed into Spotify, 30s preview otherwise). No
+  hardcoded discography.
+- Forms persist to the browser locally so you can demo the flow — no real backend,
+  payments, or email yet.
+- **Tour** dates are placeholders awaiting the real schedule (in `SEED.tour`,
+  `src/store.jsx`).
+- **Merch** is hidden on the public site until products are live — re-enable
+  `<MerchSection />` in `src/PublicSite.jsx` when ready.
 - Socials and ticket buttons are placeholders — wire them to real URLs when ready.
-- Suggested next steps: add the Spotify track IDs, drop in the real tour dates, and decide Inner Circle pricing/perks.
+- Suggested next steps: drop in the real tour dates and decide Inner Circle
+  pricing/perks.
 
 To go live, the natural next layer is a backend (e.g. an API + database) behind the existing store interface in `src/store.jsx`, plus real auth on the admin view.
 

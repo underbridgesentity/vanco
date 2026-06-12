@@ -2,26 +2,12 @@
    VANCO — public site
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, PLATFORMS, SEED, useStore, fmtDay, fmtMon, Reveal } from "./store.jsx";
+import { Icon, SEED, SPOTIFY, useStore, fmtDay, fmtMon, Reveal } from "./store.jsx";
 import { ASSETS as A } from "./assets.js";
 
 const NAVLINKS = [
   ["Music", "music"], ["Tour", "tour"], ["About", "about"], ["Submit", "submit"], ["Book", "book"],
 ];
-const VENUES = ["Tomorrowland Dubai", "Ushuaïa Ibiza", "Blue Marlin Ibiza", "Fabric London", "Outernet London", "Ultra South Africa", "Club Chinois", "Playa Soleil", "Akasha Las Dalias", "Mixmag Lab Live SA"];
-
-/* ---------- smart links ---------- */
-function SmartLinks({ light }) {
-  return (
-    <div className="smartlinks">
-      {PLATFORMS.map((p) => (
-        <a key={p.key} className="slk" href="#" onClick={(e) => e.preventDefault()} title={`Listen on ${p.label}`}>
-          <Icon name={p.icon} size={15} /> {p.label}
-        </a>
-      ))}
-    </div>
-  );
-}
 
 /* ---------- NAV ---------- */
 function Nav({ active, onAdmin, playing }) {
@@ -85,12 +71,12 @@ function Hero({ onPlay, playing, heroImg }) {
         <h1>Rhythm<br />without<br /><span className="o">borders</span></h1>
         <p className="hero-sub">DJ and producer blending Afro house, melodic techno and tribal electronic rhythms — rooted in African spirit, designed for every dancefloor on earth.</p>
         <div className="hero-cta">
-          <button className="btn btn-fill btn-lg" onClick={() => onPlay(SEED.releases[0])}>
+          <button className="btn btn-fill btn-lg" onClick={onPlay}>
             <Icon name="play" size={15} /> Play latest
           </button>
-          <button className="np" onClick={() => onPlay(SEED.releases[0])}>
-            <span className="pp"><Icon name={playing && playing.id === "r1" ? "pause" : "play"} size={14} /></span>
-            <span className="meta">Now playing · <b>Ma Tnsani</b> feat. Aya</span>
+          <button className="np" onClick={onPlay}>
+            <span className="pp"><Icon name={playing ? "pause" : "play"} size={14} /></span>
+            <span className="meta">Now playing · <b>Ma Tnsani</b> feat. AYA</span>
             <span className="eqbars"><i /><i /><i /><i /></span>
           </button>
         </div>
@@ -99,21 +85,10 @@ function Hero({ onPlay, playing, heroImg }) {
   );
 }
 
-/* ---------- MARQUEE ---------- */
-function Marquee({ lite, items = VENUES }) {
-  const row = items.concat(items);
-  return (
-    <div className={`marquee ${lite ? "lite" : ""}`}>
-      <div className="mtrack">{row.map((v, i) => <span key={i}>{v}</span>)}</div>
-    </div>
-  );
-}
-
 /* ---------- MUSIC ---------- */
-function MusicSection({ playing, onPlay }) {
-  const feat = SEED.releases[0];
-  const rest = SEED.releases.slice(1);
-  const isPlaying = (id) => playing && playing.id === id;
+// Feeds live from Vanco's Spotify artist profile — always his real, current
+// catalogue (latest releases + top tracks), playable in-page.
+function MusicSection() {
   return (
     <section className="sec light sec-pad" id="music" data-screen-label="Music">
       <div className="wrap">
@@ -122,59 +97,24 @@ function MusicSection({ playing, onPlay }) {
             <div className="idx">(01) — Discography</div>
             <h2>Music</h2>
           </div>
-          <SmartLinksMini />
+          <a className="btn btn-fill on-light" href={SPOTIFY.artistUrl} target="_blank" rel="noreferrer">
+            <Icon name="spotify" size={16} /> Open on Spotify
+          </a>
         </Reveal>
-
-        <Reveal className="feature">
-          <div className="feature-art">
-            <img src={A.blue} alt={feat.title} />
-            <div className="ov" />
-            <span className="pill tag" style={{ borderColor: "rgba(255,255,255,.5)", color: "#fff" }}><Icon name="dot" size={9} /> Latest single</span>
-            <button className="bigplay" onClick={() => onPlay(feat)} aria-label="Play">
-              <Icon name={isPlaying(feat.id) ? "pause" : "play"} size={22} />
-            </button>
-          </div>
-          <div className="feature-body">
-            <div className="ftitle">{feat.title}</div>
-            <div className="ffeat">feat. {feat.feat} · {feat.label}</div>
-            <div className={`wave ${isPlaying(feat.id) ? "playing" : ""}`}>
-              {Array.from({ length: 56 }).map((_, i) => (
-                <i key={i} style={{ height: `${20 + Math.abs(Math.sin(i * 0.5)) * 80}%`, animationDelay: `${i * 0.03}s` }} />
-              ))}
-            </div>
-            <p className="feature-note">{feat.note}.</p>
-            <div className="feature-stats">
-              <div><div className="n">80.4M</div><div className="l">Global streams</div></div>
-              <div><div className="n">200k+</div><div className="l">TikTok videos</div></div>
-              <div><div className="n">#1</div><div className="l">Shazam · Ibiza ’25</div></div>
-            </div>
-            <SmartLinks />
-          </div>
+        <Reveal className="spotify-feed">
+          <iframe
+            title="Vanco on Spotify"
+            src={`https://open.spotify.com/embed/artist/${SPOTIFY.artistId}?utm_source=generator&theme=0`}
+            width="100%" height="520" frameBorder="0" loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            allowFullScreen
+          />
         </Reveal>
-
-        <div className="rel-list">
-          {rest.map((r, i) => (
-            <Reveal as="div" key={r.id} className="rel" onClick={() => onPlay(r)} delay={i * 40}>
-              <div className="rnum mono">{String(i + 2).padStart(2, "0")}</div>
-              <div>
-                <div className="rt">{r.title}{r.fresh && <span className="badge-new">New</span>}</div>
-                <div className="rf">{r.feat}</div>
-              </div>
-              <div className="rtype">{r.type} · {r.year}</div>
-              <div className="rstream">{r.streams}</div>
-              <div className="rplay"><Icon name={isPlaying(r.id) ? "pause" : "play"} size={15} /></div>
-            </Reveal>
-          ))}
-        </div>
+        <Reveal className="spotify-note mono" as="div">
+          Live from Vanco’s Spotify — always the latest releases &amp; top tracks. Press play to listen.
+        </Reveal>
       </div>
     </section>
-  );
-}
-function SmartLinksMini() {
-  return (
-    <div className="foot-socials" style={{ color: "var(--mute-l)" }}>
-      {PLATFORMS.map((p) => <a key={p.key} href="#" onClick={(e) => e.preventDefault()} title={p.label} style={{ color: "inherit" }}><Icon name={p.icon} size={20} /></a>)}
-    </div>
   );
 }
 
@@ -514,61 +454,29 @@ function Footer({ onAdmin }) {
 }
 
 /* ---------- PLAYER BAR ---------- */
-// Fallback link when a track has no Spotify ID yet — opens it on Spotify.
-const spotifySearch = (t) => `https://open.spotify.com/search/${encodeURIComponent(`Vanco ${t.title}`)}`;
-
-function PlayerBar({ track, onClose }) {
-  const [prog, setProg] = useState(8);
-  const hasEmbed = !!track?.spotify;
-  useEffect(() => {
-    if (!track || hasEmbed) return;
-    setProg(8);
-    const t = setInterval(() => setProg((p) => (p >= 100 ? 8 : p + 0.4)), 200);
-    return () => clearInterval(t);
-  }, [track?.id, hasEmbed]);
-  if (!track) return null;
-
-  // Real audio: official Spotify embed (full track if the visitor is signed into
-  // Spotify, 30s preview otherwise). Driven by the track's `spotify` ID.
-  if (hasEmbed) {
-    return (
-      <div className="playerbar spotify">
-        <iframe
-          title={`${track.title} on Spotify`}
-          src={`https://open.spotify.com/embed/track/${track.spotify}?utm_source=generator&theme=0`}
-          width="100%" height="80" frameBorder="0" loading="lazy"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          allowFullScreen
-        />
-        <button className="pb-x pb-x-embed" onClick={onClose} aria-label="Close"><Icon name="x" size={16} /></button>
-      </div>
-    );
-  }
-
-  // Fallback until the track's Spotify ID is wired in.
+// Docks the official Spotify player for the featured single — real audio in-page
+// (full track if the visitor is signed into Spotify, 30s preview otherwise).
+function PlayerBar({ open, onClose }) {
+  if (!open) return null;
   return (
-    <div className="playerbar">
-      <div className="pb-prog"><span style={{ width: `${prog}%` }} /></div>
-      <div className="pb-in">
-        <a className="pb-pp" href={spotifySearch(track)} target="_blank" rel="noreferrer" aria-label="Play on Spotify"><Icon name="play" size={16} /></a>
-        <div className="pb-meta">
-          <div className="pb-t">{track.title}</div>
-          <div className="pb-f">{track.feat}</div>
-        </div>
-        <span className="eqbars" style={{ height: 16 }}><i /><i /><i /><i /></span>
-        <a className="pb-spotify" href={spotifySearch(track)} target="_blank" rel="noreferrer"><Icon name="spotify" size={17} /> Listen on Spotify</a>
-        <div className="pb-time mono">{track.len}</div>
-        <button className="pb-x" onClick={onClose} aria-label="Close"><Icon name="x" size={16} /></button>
-      </div>
+    <div className="playerbar spotify">
+      <iframe
+        title={`${SPOTIFY.featuredTitle} on Spotify`}
+        src={`https://open.spotify.com/embed/track/${SPOTIFY.featuredTrackId}?utm_source=generator&theme=0`}
+        width="100%" height="80" frameBorder="0" loading="lazy"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+      <button className="pb-x pb-x-embed" onClick={onClose} aria-label="Close player"><Icon name="x" size={16} /></button>
     </div>
   );
 }
 
 /* ---------- PUBLIC SITE ROOT ---------- */
 export function PublicSite({ onAdmin, heroImg }) {
-  const [playing, setPlaying] = useState(null);
+  const [playing, setPlaying] = useState(false);
   const [active, setActive] = useState("top");
-  const onPlay = (t) => setPlaying((cur) => (cur && cur.id === t.id ? null : t));
+  const togglePlay = () => setPlaying((p) => !p);
   useEffect(() => {
     const ids = ["music", "tour", "about", "submit", "book"];
     const io = new IntersectionObserver((es) => {
@@ -579,10 +487,9 @@ export function PublicSite({ onAdmin, heroImg }) {
   }, []);
   return (
     <div>
-      <Nav active={active} onAdmin={onAdmin} playing={playing} />
-      <Hero onPlay={onPlay} playing={playing} heroImg={heroImg} />
-      <Marquee />
-      <MusicSection playing={playing} onPlay={onPlay} />
+      <Nav active={active} onAdmin={onAdmin} />
+      <Hero onPlay={togglePlay} playing={playing} heroImg={heroImg} />
+      <MusicSection />
       <TourSection />
       <AboutSection />
       <SubmitSection />
@@ -590,7 +497,7 @@ export function PublicSite({ onAdmin, heroImg }) {
       <JoinSection />
       {/* Merch hidden until products are live — re-enable <MerchSection /> when ready. */}
       <Footer onAdmin={onAdmin} />
-      <PlayerBar track={playing} onClose={() => setPlaying(null)} />
+      <PlayerBar open={playing} onClose={() => setPlaying(false)} />
     </div>
   );
 }

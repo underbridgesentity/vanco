@@ -149,16 +149,13 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 @keyframes eq { 0%,100%{ height:3px } 50%{ height:14px } }
 
 /* =========================================================
-   MARQUEE
+   SPOTIFY FEED (Music section — live from artist profile)
    ========================================================= */
-.marquee { border-top: 1px solid var(--line-d-soft); border-bottom: 1px solid var(--line-d-soft); overflow: hidden; padding: 18px 0; background: var(--void); }
-.marquee.lite { border-color: var(--line-l-soft); background: var(--paper); }
-.mtrack { display: inline-flex; gap: 46px; white-space: nowrap; animation: marq 38s linear infinite; will-change: transform; }
-.marquee:hover .mtrack { animation-play-state: paused; }
-.mtrack span { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute-d); display: inline-flex; align-items: center; gap: 46px; }
-.mtrack span::after { content: "✦"; color: var(--accent); }
-.lite .mtrack span { color: var(--mute-l); }
-@keyframes marq { to { transform: translateX(-50%); } }
+.spotify-feed { border: 1px solid var(--line-l); border-radius: 14px; overflow: hidden; background: #121212; box-shadow: 0 24px 60px -30px rgba(0,0,0,.4); }
+.spotify-feed iframe { display: block; width: 100%; height: 520px; border: 0; }
+.spotify-note { margin-top: 18px; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mute-l); }
+.shead .btn-fill.on-light svg { color: #1db954; }
+@media (max-width: 720px){ .spotify-feed iframe { height: 420px; } }
 
 /* =========================================================
    SECTION HEADER
@@ -370,3 +367,24 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 .playerbar.spotify iframe { flex: 1; display: block; border: 0; min-width: 0; }
 .playerbar.spotify .pb-x-embed { padding: 0 18px; flex: none; }
 @media(max-width:720px){ .pb-links, .pb-time, .pb-spotify { display: none; } .pb-in { gap: 12px; padding: 12px 18px; } }
+
+/* =========================================================
+   SMALL-SCREEN PASS — tighten gutters & stack for phones
+   ========================================================= */
+@media (max-width: 700px) {
+  .wrap { padding: 0 20px; }
+  .nav-in { padding: 14px 20px; }
+  .hero-in { padding: 92px 20px 44px; }
+  .hero h1 { font-size: clamp(40px, 13vw, 72px); }
+  .hero-cta { gap: 12px; }
+  .hero-cta .np { width: 100%; justify-content: flex-start; }
+  .sec-pad { padding: 60px 0; }
+  .shead .btn { width: 100%; justify-content: center; }
+  .foot-top { grid-template-columns: 1fr; gap: 26px; }
+  .foot-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .spotify-feed iframe { height: 380px; }
+}
+@media (max-width: 380px) {
+  .wrap { padding: 0 16px; }
+  .hero-in { padding: 86px 16px 40px; }
+}
