@@ -62,7 +62,7 @@ function Nav({ active, onAdmin, playing }) {
 }
 
 /* ---------- HERO ---------- */
-function Hero({ onPlay, playing, heroImg }) {
+function Hero({ onPlay, heroImg }) {
   return (
     <header className="hero" id="top" data-screen-label="Hero">
       <div className="hero-bg"><img src={heroImg || A.blue} alt="Vanco" /></div>
@@ -73,11 +73,6 @@ function Hero({ onPlay, playing, heroImg }) {
         <div className="hero-cta">
           <button className="btn btn-fill btn-lg" onClick={onPlay}>
             <Icon name="play" size={15} /> Play latest
-          </button>
-          <button className="np" onClick={onPlay}>
-            <span className="pp"><Icon name={playing ? "pause" : "play"} size={14} /></span>
-            <span className="meta">Now playing · <b>Ma Tnsani</b> feat. AYA</span>
-            <span className="eqbars"><i /><i /><i /><i /></span>
           </button>
         </div>
       </div>
@@ -488,7 +483,7 @@ export function PublicSite({ onAdmin, heroImg }) {
   return (
     <div>
       <Nav active={active} onAdmin={onAdmin} />
-      <Hero onPlay={togglePlay} playing={playing} heroImg={heroImg} />
+      <Hero onPlay={togglePlay} heroImg={heroImg} />
       <MusicSection />
       <TourSection />
       <AboutSection />

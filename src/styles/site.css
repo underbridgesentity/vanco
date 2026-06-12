@@ -122,16 +122,27 @@ section[data-screen-label] { scroll-margin-top: 76px; }
    HERO
    ========================================================= */
 .hero { min-height: 100svh; position: relative; display: flex; align-items: flex-end; overflow: hidden; background: var(--void); }
+/* Desktop: the full portrait floats to the right (zoomed out, uncropped),
+   text sits on the dark left — so the headline never touches his face. */
 .hero-bg { position: absolute; inset: 0; z-index: 0; }
-.hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 82% 18%; opacity: .95; }
+.hero-bg img { width: 100%; height: 100%; object-fit: contain; object-position: right bottom; opacity: .97; }
 .hero-bg::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(5,5,6,.5) 0%, rgba(5,5,6,.04) 26%, rgba(5,5,6,.12) 56%, rgba(5,5,6,.97) 100%),
-              linear-gradient(90deg, rgba(5,5,6,.95) 0%, rgba(5,5,6,.66) 34%, rgba(5,5,6,.06) 68%, transparent 100%); }
-.hero-mono { position: absolute; z-index: 1; right: -4%; top: 8%; width: 46%; max-width: 660px; opacity: .05; pointer-events: none; }
+  background: linear-gradient(90deg, var(--void) 28%, rgba(5,5,6,.72) 48%, rgba(5,5,6,.08) 72%, transparent 88%),
+              linear-gradient(0deg, var(--void) 0%, rgba(5,5,6,.35) 12%, transparent 30%); }
+.hero-mono { position: absolute; z-index: 1; left: 2%; bottom: 12%; width: 34%; max-width: 460px; opacity: .045; pointer-events: none; }
 .hero-in { position: relative; z-index: 2; width: 100%; max-width: 1480px; margin: 0 auto; padding: 120px 40px 64px; }
+
+/* Tablet & mobile: full-bleed cover for an immersive frame */
+@media (max-width: 900px) {
+  .hero-bg img { object-fit: cover; object-position: 66% 16%; }
+  .hero-bg::after {
+    background: linear-gradient(180deg, rgba(5,5,6,.45) 0%, rgba(5,5,6,.05) 24%, rgba(5,5,6,.42) 60%, rgba(5,5,6,.98) 100%),
+                linear-gradient(90deg, rgba(5,5,6,.86) 0%, rgba(5,5,6,.32) 46%, transparent 82%); }
+  .hero-mono { left: auto; right: -4%; top: 7%; bottom: auto; width: 46%; }
+}
 .hero-kick { display: flex; align-items: center; gap: 14px; color: var(--mute-d); margin-bottom: 26px; }
 .hero-kick .dotsep { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
-.hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: .92; font-size: clamp(44px, 8.4vw, 130px); text-transform: uppercase; max-width: 9ch; }
+.hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: .94; font-size: clamp(40px, 6.4vw, 104px); text-transform: uppercase; max-width: 8ch; }
 .hero h1 .o { color: transparent; -webkit-text-stroke: 1.5px #fff; }
 .hero-sub { margin-top: 24px; max-width: 480px; font-size: clamp(15px,1.4vw,19px); line-height: 1.5; color: rgba(255,255,255,.82); font-weight: 400; }
 .hero-cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
