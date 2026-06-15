@@ -77,20 +77,40 @@ export const SPOTIFY = {
   featuredFeat: "feat. AYA",
 };
 
+// Vanco's official Resident Advisor tour page — canonical, always-current ticket listings.
+export const RA_TOUR = "https://ra.co/dj/vanco/tour-dates";
+
 /* ---------- seed data ---------- */
 export const SEED = {
-  // No hardcoded discography — the Music section pulls live from Spotify (see SPOTIFY).
+  // 2026 tour. `tickets` = official link where known (otherwise the UI builds a
+  // precise per-event search). `cap` = guest-list spots Vanco releases per show
+  // (0 / omitted = no guest list, e.g. private bookings).
   tour: [
-    { id: "t1", date: "2026-06-14", city: "Ibiza", country: "ES", venue: "Ushuaïa", region: "Europe", status: "Tickets" },
-    { id: "t2", date: "2026-06-21", city: "Ibiza", country: "ES", venue: "Blue Marlin", region: "Europe", status: "Tickets" },
-    { id: "t3", date: "2026-07-05", city: "Boom", country: "BE", venue: "Tomorrowland", region: "Europe", status: "Sold Out" },
-    { id: "t4", date: "2026-07-19", city: "London", country: "UK", venue: "Fabric", region: "Europe", status: "Tickets" },
-    { id: "t5", date: "2026-08-02", city: "Ibiza", country: "ES", venue: "Akasha, Las Dalias", region: "Europe", status: "Tickets" },
-    { id: "t6", date: "2026-08-30", city: "Cape Town", country: "ZA", venue: "Ultra South Africa", region: "Africa", status: "Tickets" },
-    { id: "t7", date: "2026-09-13", city: "Dubai", country: "AE", venue: "Club Chinois", region: "Middle East", status: "Tickets" },
-    { id: "t8", date: "2026-10-04", city: "Sydney", country: "AU", venue: "Day One Festival", region: "Australasia", status: "RSVP" },
-    { id: "t9", date: "2026-10-25", city: "New York", country: "US", venue: "Brooklyn Mirage", region: "Americas", status: "Announced" },
-    { id: "t10", date: "2026-11-08", city: "Bali", country: "ID", venue: "Savaya", region: "Asia", status: "Tickets" },
+    { id: "t1", date: "2026-06-01", city: "Ibiza", country: "ES", venue: "Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events-calendar", cap: 20 },
+    { id: "t2", date: "2026-06-05", city: "Monte Carlo", country: "MC", venue: "Nikki Beach — F1 Grand Prix", region: "Europe", status: "Tickets", cap: 15 },
+    { id: "t3", date: "2026-06-06", city: "Monte Carlo", country: "MC", venue: "Private Party", region: "Europe", status: "Private" },
+    { id: "t4", date: "2026-06-07", city: "Ibiza", country: "ES", venue: "Mestiza · Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events/2026/mestiza", cap: 20 },
+    { id: "t5", date: "2026-06-12", city: "Porto Cervo", country: "IT", venue: "Twiga · Sardinia", region: "Europe", status: "Tickets", cap: 18 },
+    { id: "t6", date: "2026-06-14", city: "Costa da Caparica", country: "PT", venue: "Maresia Intimate Festival", region: "Europe", status: "Tickets", cap: 25 },
+    { id: "t7", date: "2026-06-15", city: "Ibiza", country: "ES", venue: "Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events-calendar", cap: 20 },
+    { id: "t8", date: "2026-06-18", city: "Lisbon", country: "PT", venue: "SunceBeat", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t9", date: "2026-06-19", city: "London", country: "GB", venue: "Ministry of Sound", region: "Europe", status: "Tickets", tickets: "https://www.ministryofsound.com/whats-on/", cap: 25 },
+    { id: "t10", date: "2026-06-20", city: "Yeni İskele", country: "CY", venue: "Pera Mackenzie", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t11", date: "2026-06-26", city: "Paris", country: "FR", venue: "l’Envol", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t12", date: "2026-06-27", city: "Stuttgart", country: "DE", venue: "Zubrovka House Festival", region: "Europe", status: "Tickets", cap: 25 },
+    { id: "t13", date: "2026-06-29", city: "Mykonos", country: "GR", venue: "Cavo", region: "Europe", status: "Tickets", cap: 18 },
+    { id: "t14", date: "2026-07-02", city: "Casablanca", country: "MA", venue: "Cazaloka", region: "Africa", status: "Tickets", cap: 20 },
+    { id: "t15", date: "2026-07-03", city: "Ibiza", country: "ES", venue: "Chinois", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t16", date: "2026-07-04", city: "Jesolo Lido", country: "IT", venue: "King’s Club", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t17", date: "2026-07-09", city: "Saint-Tropez", country: "FR", venue: "Naomad", region: "Europe", status: "Tickets", cap: 15 },
+    { id: "t18", date: "2026-07-10", city: "Alanya", country: "TR", venue: "Sundaze Beach Club", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t19", date: "2026-07-11", city: "Ibiza", country: "ES", venue: "Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events-calendar", cap: 20 },
+    { id: "t20", date: "2026-07-17", city: "Boom", country: "BE", venue: "Tomorrowland", region: "Europe", status: "Tickets", tickets: "https://www.tomorrowland.com/", cap: 30 },
+    { id: "t21", date: "2026-07-18", city: "Tivat", country: "ME", venue: "Aura Beach", region: "Europe", status: "Tickets", cap: 20 },
+    { id: "t22", date: "2026-07-24", city: "Bucharest", country: "RO", venue: "Nebula", region: "Europe", status: "Tickets", cap: 25 },
+    { id: "t23", date: "2026-07-25", city: "Marseille", country: "FR", venue: "Delta Festival", region: "Europe", status: "Tickets", cap: 30 },
+    { id: "t24", date: "2026-07-29", city: "Alta Rocca", country: "FR", venue: "L’Alta Rocca", region: "Europe", status: "Tickets", cap: 18 },
+    { id: "t25", date: "2026-07-30", city: "Tunis", country: "TN", venue: "Calypso", region: "Africa", status: "Tickets", cap: 20 },
   ],
   submissions: [
     { id: "s1", artist: "Kioko", track: "Midnight in Maputo", genre: "Afro House", email: "kioko@mail.com", label: "—", link: "soundcloud.com/kioko/midnight", msg: "Long-time fan. Built this around a marimba loop — would love your ears on it.", status: "New", date: "2026-05-29" },
@@ -115,17 +135,29 @@ export const SEED = {
     { id: "f7", name: "Diego F.", email: "diego@mail.mx", country: "Mexico", interests: ["Tour alerts", "Merch"], date: "2026-05-28", tier: "Free" },
     { id: "f8", name: "Amara N.", email: "amara@mail.ng", country: "Nigeria", interests: ["New music", "Exclusive mixes"], date: "2026-05-28", tier: "Inner Circle" },
   ],
+  guestlist: [
+    { id: "g1", eventId: "t9", name: "Sofia Marais", email: "sofia@mail.com", instagram: "@sofiam", guests: 2, msg: "Huge fan — would love to bring my sister to the Ministry show.", status: "Pending", date: "2026-06-10" },
+    { id: "g2", eventId: "t1", name: "Léa Dubois", email: "lea@mail.fr", instagram: "@lea.d", guests: 1, msg: "", status: "Approved", date: "2026-05-28" },
+    { id: "g3", eventId: "t9", name: "Tom Blake", email: "tom@mail.uk", instagram: "", guests: 2, msg: "Following since Ma Tnsani — first time catching a set.", status: "Pending", date: "2026-06-11" },
+    { id: "g4", eventId: "t20", name: "Andrei Pop", email: "andrei@mail.ro", instagram: "@andrei.p", guests: 1, msg: "Travelling from Bucharest for Tomorrowland.", status: "Waitlist", date: "2026-06-09" },
+    { id: "g5", eventId: "t15", name: "Marie Laurent", email: "marie@mail.fr", instagram: "@marie.l", guests: 2, msg: "", status: "Pending", date: "2026-06-12" },
+    { id: "g6", eventId: "t1", name: "Diego Fernández", email: "diego@mail.es", instagram: "@dfernandez", guests: 1, msg: "Local to Ibiza, never miss a Vanco night.", status: "Approved", date: "2026-05-26" },
+  ],
   fanBase: 24716, // baseline count the recent list sits on top of
 };
 
+// Quick lookup from event id → tour entry (for guest-list views).
+export const tourById = Object.fromEntries(SEED.tour.map((t) => [t.id, t]));
+
 /* ---------- store w/ localStorage persistence ---------- */
-const KEY = "vanco_platform_v1";
+const KEY = "vanco_platform_v2";
+const DEFAULT_STORE = { submissions: SEED.submissions, bookings: SEED.bookings, fans: SEED.fans, guestlist: SEED.guestlist };
 function loadStore() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return { ...DEFAULT_STORE, ...JSON.parse(raw) };
   } catch (e) {}
-  return { submissions: SEED.submissions, bookings: SEED.bookings, fans: SEED.fans };
+  return DEFAULT_STORE;
 }
 function persist(s) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
@@ -139,8 +171,9 @@ export function StoreProvider({ children }) {
   const [submissions, setSubmissions] = useState(init.submissions);
   const [bookings, setBookings] = useState(init.bookings);
   const [fans, setFans] = useState(init.fans);
+  const [guestlist, setGuestlist] = useState(init.guestlist);
 
-  useEffect(() => { persist({ submissions, bookings, fans }); }, [submissions, bookings, fans]);
+  useEffect(() => { persist({ submissions, bookings, fans, guestlist }); }, [submissions, bookings, fans, guestlist]);
 
   const today = () => new Date().toISOString().slice(0, 10);
   const uid = (p) => p + Math.random().toString(36).slice(2, 8);
@@ -148,13 +181,20 @@ export function StoreProvider({ children }) {
   const addSubmission = (d) => setSubmissions((x) => [{ id: uid("s"), status: "New", date: today(), _new: true, ...d }, ...x]);
   const addBooking = (d) => setBookings((x) => [{ id: uid("b"), status: "New", created: today(), _new: true, ...d }, ...x]);
   const addFan = (d) => setFans((x) => [{ id: uid("f"), date: today(), _new: true, ...d }, ...x]);
+  const addGuest = (d) => setGuestlist((x) => [{ id: uid("g"), status: "Pending", date: today(), _new: true, ...d }, ...x]);
   const setSubStatus = (id, status) => setSubmissions((x) => x.map((s) => s.id === id ? { ...s, status } : s));
   const setBookStatus = (id, status) => setBookings((x) => x.map((b) => b.id === id ? { ...b, status } : b));
-  const resetAll = () => { setSubmissions(SEED.submissions); setBookings(SEED.bookings); setFans(SEED.fans); };
+  const setGuestStatus = (id, status) => setGuestlist((x) => x.map((g) => g.id === id ? { ...g, status } : g));
+  const resetAll = () => { setSubmissions(SEED.submissions); setBookings(SEED.bookings); setFans(SEED.fans); setGuestlist(SEED.guestlist); };
+
+  // Heads approved for an event (sums party sizes), used against each event's cap.
+  const approvedFor = (eventId) => guestlist
+    .filter((g) => g.eventId === eventId && g.status === "Approved")
+    .reduce((n, g) => n + (Number(g.guests) || 1), 0);
 
   const fanTotal = SEED.fanBase + fans.length;
 
-  const value = { submissions, bookings, fans, fanTotal, addSubmission, addBooking, addFan, setSubStatus, setBookStatus, resetAll };
+  const value = { submissions, bookings, fans, guestlist, fanTotal, addSubmission, addBooking, addFan, addGuest, setSubStatus, setBookStatus, setGuestStatus, approvedFor, resetAll };
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 

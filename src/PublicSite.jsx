@@ -2,7 +2,7 @@
    VANCO — public site
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, SEED, SPOTIFY, useStore, fmtDay, fmtMon, Reveal } from "./store.jsx";
+import { Icon, SEED, SPOTIFY, RA_TOUR, tourById, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
 import { ASSETS as A } from "./assets.js";
 
 const NAVLINKS = [
@@ -114,9 +114,13 @@ function MusicSection() {
 }
 
 /* ---------- TOUR ---------- */
-const REGIONS = ["All", "Europe", "Africa", "Middle East", "Asia", "Australasia", "Americas"];
+const REGIONS = ["All", ...Array.from(new Set(SEED.tour.map((t) => t.region)))];
+// Official ticket link where known, otherwise a precise per-event search.
+const ticketUrl = (t) => t.tickets || `https://www.google.com/search?q=${encodeURIComponent(`Vanco ${t.venue} ${t.city} tickets 2026`)}`;
+
 function TourSection() {
   const [reg, setReg] = useState("All");
+  const [guestEvent, setGuestEvent] = useState(null);
   const list = SEED.tour.filter((t) => reg === "All" || t.region === reg);
   return (
     <section className="sec dark sec-pad" id="tour" data-screen-label="Tour">
@@ -126,8 +130,9 @@ function TourSection() {
             <div className="idx">(02) — 2026 Season</div>
             <h2>Tour</h2>
           </div>
-          <div style={{ maxWidth: 340 }}>
-            <p style={{ color: "var(--mute-d)", fontSize: 14.5, lineHeight: 1.5 }}>From Ibiza to Bali — now opening up Australasia and the Americas. Members get tickets first.</p>
+          <div style={{ maxWidth: 360 }}>
+            <p style={{ color: "var(--mute-d)", fontSize: 14.5, lineHeight: 1.5, marginBottom: 14 }}>Summer 2026 across Europe and North Africa. Every show holds a limited guest list — request your spot below.</p>
+            <a className="ra-link mono" href={RA_TOUR} target="_blank" rel="noreferrer">All dates &amp; tickets on Resident Advisor <Icon name="arrowUR" size={14} className="mv" /></a>
           </div>
         </Reveal>
         <div className="tfilters">
@@ -139,23 +144,86 @@ function TourSection() {
           {list.map((t) => (
             <Reveal as="div" key={t.id} className="trow">
               <div className="tdate"><span className="d">{fmtDay(t.date)}</span><span className="m">{fmtMon(t.date)}</span></div>
-              <div>
+              <div className="tinfo">
                 <div className="tcity">{t.city}, {t.country}</div>
                 <div className="tven">{t.venue}</div>
               </div>
               <div className="treg">{t.region}</div>
-              <div className="tstatus">
-                {t.status === "Sold Out"
-                  ? <span className="tag-sold">Sold Out</span>
-                  : t.status === "Announced"
-                    ? <span className="tag-sold">Just announced</span>
-                    : <button className="btn btn-ghost">{t.status === "RSVP" ? "RSVP" : "Tickets"} <Icon name="arrowUR" size={14} className="mv" /></button>}
+              <div className="tactions">
+                {t.status === "Private" ? (
+                  <span className="tag-sold">Private event</span>
+                ) : (
+                  <>
+                    {t.cap ? <button className="btn btn-ghost tg-btn" onClick={() => setGuestEvent(t)}>Guest list</button> : null}
+                    <a className="btn btn-fill tg-btn" href={ticketUrl(t)} target="_blank" rel="noreferrer">Tickets <Icon name="arrowUR" size={14} className="mv" /></a>
+                  </>
+                )}
               </div>
             </Reveal>
           ))}
         </div>
       </div>
+      {guestEvent && <GuestListModal event={guestEvent} onClose={() => setGuestEvent(null)} />}
     </section>
+  );
+}
+
+/* ---------- GUEST LIST REQUEST ---------- */
+function GuestListModal({ event, onClose }) {
+  const { addGuest } = useStore();
+  const [f, setF] = useState({ name: "", email: "", instagram: "", guests: 1, msg: "" });
+  const [sent, setSent] = useState(false);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const submit = (e) => {
+    e.preventDefault();
+    addGuest({ eventId: event.id, name: f.name, email: f.email, instagram: f.instagram, guests: Number(f.guests), msg: f.msg });
+    setSent(true);
+  };
+  useEffect(() => {
+    const k = (e) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", k);
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", k); document.body.style.overflow = ""; };
+  }, []);
+  return (
+    <div className="modal-scrim" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-x" onClick={onClose} aria-label="Close"><Icon name="x" size={18} /></button>
+        {sent ? (
+          <div className="sent" style={{ padding: "32px 12px" }}>
+            <div className="ck"><Icon name="check" size={32} /></div>
+            <h4>You’re on the list</h4>
+            <p>Request received for <b>{event.venue}</b>, {event.city}. Spots are limited — we’ll email you if you’re confirmed.</p>
+            <button className="btn btn-ghost" onClick={onClose}>Done</button>
+          </div>
+        ) : (
+          <>
+            <div className="modal-head">
+              <div className="idx kicker" style={{ opacity: .55, marginBottom: 10 }}>Guest list</div>
+              <h3>{event.venue}</h3>
+              <div className="modal-sub mono">{event.city}, {event.country} · {fmtFull(event.date)}</div>
+            </div>
+            <form className="form-grid" onSubmit={submit}>
+              <Field label="Full name"><input required value={f.name} onChange={set("name")} placeholder="Your name" /></Field>
+              <Field label="Email"><input required type="email" value={f.email} onChange={set("email")} placeholder="you@email.com" /></Field>
+              <Field label="Instagram (optional)"><input value={f.instagram} onChange={set("instagram")} placeholder="@handle" /></Field>
+              <Field label="Party size">
+                <div className="chips">
+                  {[["1", "Just me"], ["2", "Me + 1"]].map(([v, l]) => (
+                    <span key={v} className={`chip-sel ${String(f.guests) === v ? "on" : ""}`} onClick={() => setF({ ...f, guests: Number(v) })}>{l}</span>
+                  ))}
+                </div>
+              </Field>
+              <Field label="Why you (optional)" full><textarea value={f.msg} onChange={set("msg")} placeholder="Tell the team anything that helps your case" /></Field>
+              <div className="form-foot">
+                <span className="form-note">Limited spots · confirmed by email</span>
+                <button className="btn btn-accent btn-lg" type="submit">Request a spot <Icon name="arrowR" size={15} className="mv" /></button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 

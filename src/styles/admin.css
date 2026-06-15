@@ -85,9 +85,9 @@
 /* status chips */
 .sc { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--aline); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .sc::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.sc.new { color: #5b8cff; border-color: rgba(91,140,255,.4); background: rgba(91,140,255,.1); }
-.sc.review, .sc.listened, .sc.reviewing { color: #ffb84d; border-color: rgba(255,184,77,.35); background: rgba(255,184,77,.1); }
-.sc.shortlist, .sc.confirmed, .sc.signed { color: #3ddc84; border-color: rgba(61,220,132,.35); background: rgba(61,220,132,.1); }
+.sc.new, .sc.pending { color: #5b8cff; border-color: rgba(91,140,255,.4); background: rgba(91,140,255,.1); }
+.sc.review, .sc.listened, .sc.reviewing, .sc.waitlist { color: #ffb84d; border-color: rgba(255,184,77,.35); background: rgba(255,184,77,.1); }
+.sc.shortlist, .sc.confirmed, .sc.signed, .sc.approved { color: #3ddc84; border-color: rgba(61,220,132,.35); background: rgba(61,220,132,.1); }
 .sc.passed, .sc.declined { color: var(--amute-2); }
 .sc.inner { color: var(--accent); border-color: rgba(245,179,1,.5); background: rgba(245,179,1,.12); }
 .sc.free { color: var(--amute); }
@@ -158,6 +158,22 @@
 .toggle.on::after { transform: translateX(20px); }
 
 .empty { padding: 60px 20px; text-align: center; color: var(--amute); font-size: 14px; }
+
+/* guest-list capacity cards */
+.cap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.capcard { background: var(--apanel); border: 1px solid var(--aline); border-radius: 12px; padding: 16px 18px; }
+.capcard .cap-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.capcard .cap-ev { font-weight: 600; font-size: 14px; }
+.capcard .cap-date { font-size: 11px; color: var(--amute); }
+.capcard .cap-city { font-size: 11px; color: var(--amute-2); margin-top: 3px; }
+.cap-bar { height: 7px; border-radius: 99px; background: var(--apanel-2); overflow: hidden; margin: 14px 0 10px; }
+.cap-bar span { display: block; height: 100%; background: #3ddc84; transition: width .3s var(--ease); }
+.cap-bar span.full { background: #ff6b6b; }
+.capcard .cap-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--amute); }
+.capcard .cap-meta b { color: #fff; font-weight: 700; }
+.cap-pending { font-family: var(--mono); font-size: 10px; color: var(--accent); }
+.cap-banner { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 12px 14px; border-radius: 10px; margin-bottom: 22px; background: rgba(61,220,132,.1); border: 1px solid rgba(61,220,132,.3); color: #3ddc84; }
+.cap-banner.full { background: rgba(255,107,107,.1); border-color: rgba(255,107,107,.3); color: #ff8585; }
 
 /* mobile admin */
 .aside-toggle { display: none; }

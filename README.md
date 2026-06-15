@@ -4,8 +4,12 @@ Cutting-edge platform for **Vanco**, DJ and producer (Afro house · melodic tech
 
 Two halves of one loop:
 
-- **Public site** — a bold, black ↔ white alternating editorial experience with an electric-cobalt accent. Hero, discography with a docking player bar, filterable 2026 tour, biography, **promo submissions**, **booking inquiries**, **fan / Inner Circle sign-up**, and a merch teaser.
-- **Admin control room** — a dark dashboard contrasting the editorial site: overview with live stats + growth chart, A&R **Submissions** inbox with detail drawers and status actions, **Bookings**, **Audience** database with breakdowns + CSV export, Merch and Settings.
+- **Public site** — a bold, black ↔ white alternating editorial experience with a gold accent. Hero, live Spotify catalogue, filterable 2026 tour with **ticket links** and a per-show **guest-list request**, biography, **promo submissions**, **booking inquiries**, and **fan / Inner Circle sign-up**.
+- **Admin control room** — a dark dashboard contrasting the editorial site: overview with live stats + growth chart, A&R **Submissions** inbox with detail drawers and status actions, **Bookings**, **Guest List** (per-show capacity + approve/waitlist/decline), **Audience** database with breakdowns + CSV export, Merch and Settings.
+
+### Guest list
+
+Each tour date holds a limited guest list (capacity set per event via `cap` in `SEED.tour`). Fans request a spot from the Tour section; requests flow into the admin **Guest List** page, which tracks approved heads against each show's cap and lets the team approve, waitlist or decline.
 
 Anything submitted on the public site flows straight into admin — submissions, bookings and subscribers are persisted in the browser via `localStorage`, so the full loop is demonstrable end-to-end.
 

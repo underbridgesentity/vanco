@@ -2,7 +2,7 @@
    VANCO — admin app
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, PLATFORMS, useStore, fmtDate, fmtFull } from "./store.jsx";
+import { Icon, PLATFORMS, useStore, fmtDate, fmtFull, tourById } from "./store.jsx";
 import { ASSETS } from "./assets.js";
 
 const AA = { wordW: ASSETS.wordW, monoW: ASSETS.monoW, monoB: ASSETS.monoB };
@@ -13,13 +13,14 @@ function StatusChip({ s }) { return <span className={`sc ${scClass(s)}`}>{s}</sp
 
 /* ---------- OVERVIEW ---------- */
 function Overview({ go }) {
-  const { submissions, bookings, fans, fanTotal } = useStore();
+  const { submissions, bookings, fans, guestlist, fanTotal } = useStore();
   const newSubs = submissions.filter((s) => s.status === "New").length;
   const pendBook = bookings.filter((b) => b.status === "New" || b.status === "Reviewing").length;
   const inner = fans.filter((f) => f.tier === "Inner Circle").length;
   const feed = [
     ...submissions.slice(0, 4).map((s) => ({ ic: "music", t: <><b>{s.artist}</b> submitted “{s.track}”</>, d: `${s.genre} · ${fmtDate(s.date)}`, _d: s.date })),
     ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> — {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
+    ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{tourById[g.eventId] ? ` — ${tourById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
     ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " — Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
   ].sort((a, b) => (a._d < b._d ? 1 : -1)).slice(0, 8);
   const growth = [62, 70, 58, 88, 96, 110, 134, 128, 156, 172, 198, 240];
@@ -304,6 +305,94 @@ function Settings({ onReset }) {
   );
 }
 
+/* ---------- GUEST LIST ---------- */
+const GUEST_STATUSES = ["Pending", "Approved", "Waitlist", "Declined"];
+function GuestList({ query }) {
+  const { guestlist, setGuestStatus, approvedFor } = useStore();
+  const [filter, setFilter] = useState("All");
+  const [open, setOpen] = useState(null);
+  const list = guestlist.filter((g) =>
+    (filter === "All" || g.status === filter) &&
+    (!query || (g.name + g.email + (tourById[g.eventId]?.venue || "")).toLowerCase().includes(query.toLowerCase())));
+  const cur = guestlist.find((g) => g.id === open);
+  const ev = cur ? tourById[cur.eventId] : null;
+  const eventsWithReq = [...new Set(guestlist.map((g) => g.eventId))]
+    .map((id) => tourById[id]).filter(Boolean)
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  return (
+    <div>
+      <div className="cap-grid">
+        {eventsWithReq.map((e) => {
+          const approved = approvedFor(e.id);
+          const pending = guestlist.filter((g) => g.eventId === e.id && g.status === "Pending").length;
+          const full = approved >= (e.cap || 0);
+          const pct = e.cap ? Math.min(100, Math.round((approved / e.cap) * 100)) : 0;
+          return (
+            <div className="capcard" key={e.id}>
+              <div className="cap-top"><div className="cap-ev">{e.venue}</div><span className="mono cap-date">{fmtDate(e.date)}</span></div>
+              <div className="cap-city mono">{e.city}, {e.country}</div>
+              <div className="cap-bar"><span className={full ? "full" : ""} style={{ width: `${pct}%` }} /></div>
+              <div className="cap-meta"><span><b>{approved}</b> / {e.cap} approved</span>{pending > 0 && <span className="cap-pending">{pending} pending</span>}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="filterbar">
+        {["All", ...GUEST_STATUSES].map((f) => <button key={f} className={`fchip ${filter === f ? "on" : ""}`} onClick={() => setFilter(f)}>{f}{f !== "All" ? ` · ${guestlist.filter((g) => g.status === f).length}` : ""}</button>)}
+        <span className="spacer" />
+        <button className="abtn ghost"><Icon name="download" size={14} /> Export</button>
+      </div>
+      <div className="panel">
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead><tr><th>Guest</th><th>Event</th><th>Party</th><th>Requested</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {list.map((g) => {
+                const e = tourById[g.eventId];
+                return (
+                  <tr key={g.id} className={g._new ? "row-new" : ""} onClick={() => setOpen(g.id)}>
+                    <td><div className="cellflex"><span className="tav">{initials(g.name)}</span><div><div className="strong">{g.name}</div><div className="cellsub">{g.email}</div></div></div></td>
+                    <td><div>{e?.venue || "—"}</div><div className="cellsub">{e ? `${fmtDate(e.date)} · ${e.city}` : ""}</div></td>
+                    <td className="muted">{g.guests} {g.guests > 1 ? "people" : "person"}</td>
+                    <td className="mono muted">{fmtDate(g.date)}</td>
+                    <td><StatusChip s={g.status} /></td>
+                    <td><Icon name="chevron" size={16} style={{ color: "var(--amute)" }} /></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {list.length === 0 && <div className="empty">No guest-list requests match.</div>}
+        </div>
+      </div>
+      {cur && ev && (
+        <Drawer onClose={() => setOpen(null)} title={cur.name} sub={`${ev.venue} · ${fmtDate(ev.date)}`}
+          foot={<>
+            <button className="abtn primary" onClick={() => setGuestStatus(cur.id, "Approved")}><Icon name="check" size={14} /> Approve</button>
+            <button className="abtn ghost" onClick={() => setGuestStatus(cur.id, "Waitlist")}>Waitlist</button>
+            <button className="abtn danger" onClick={() => setGuestStatus(cur.id, "Declined")}>Decline</button>
+          </>}>
+          {(() => {
+            const approved = approvedFor(ev.id);
+            const full = approved >= (ev.cap || 0);
+            return <div className={`cap-banner ${full ? "full" : ""}`}><Icon name={full ? "x" : "check"} size={14} /> {approved} / {ev.cap} approved{full ? " — at capacity" : ` · ${ev.cap - approved} spot${ev.cap - approved === 1 ? "" : "s"} left`}</div>;
+          })()}
+          <dl className="dl">
+            <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
+            <dt>Event</dt><dd>{ev.venue}, {ev.city}</dd>
+            <dt>Date</dt><dd>{fmtFull(ev.date)}</dd>
+            <dt>Email</dt><dd><a href="#" onClick={(e) => e.preventDefault()}>{cur.email}</a></dd>
+            <dt>Instagram</dt><dd>{cur.instagram || "—"}</dd>
+            <dt>Party size</dt><dd>{cur.guests} {cur.guests > 1 ? "people" : "person"}</dd>
+            <dt>Requested</dt><dd>{fmtFull(cur.date)}</dd>
+          </dl>
+          {cur.msg && <div className="dmsg"><div className="lab">Why them</div>{cur.msg}</div>}
+        </Drawer>
+      )}
+    </div>
+  );
+}
+
 /* ---------- DRAWER ---------- */
 function Drawer({ title, sub, children, foot, onClose }) {
   useEffect(() => {
@@ -330,6 +419,7 @@ const NAV = [
   ["overview", "Overview", "grid"],
   ["submissions", "Submissions", "inbox"],
   ["bookings", "Bookings", "calendar"],
+  ["guestlist", "Guest List", "pin"],
   ["audience", "Audience", "users"],
   ["merch", "Merch", "bag"],
   ["settings", "Settings", "settings"],
@@ -341,17 +431,19 @@ export function AdminApp({ onExit }) {
   const [navOpen, setNavOpen] = useState(false);
   const newSubs = store.submissions.filter((s) => s.status === "New").length;
   const newBooks = store.bookings.filter((b) => b.status === "New").length;
-  const counts = { submissions: newSubs, bookings: newBooks };
+  const pendGuests = store.guestlist.filter((g) => g.status === "Pending").length;
+  const counts = { submissions: newSubs, bookings: newBooks, guestlist: pendGuests };
   const titles = {
     overview: ["Overview", "Control room — everything at a glance"],
     submissions: ["Submissions", "Promo & demo inbox — A&R for ALGRA"],
     bookings: ["Bookings", "Inbound show & event inquiries"],
+    guestlist: ["Guest List", "Per-show guest list — requests & capacity"],
     audience: ["Audience", "The database — fans & subscribers"],
     merch: ["Merch", "Store & product management"],
     settings: ["Settings", "Platform configuration"],
   };
   const go = (p) => { setPage(p); setNavOpen(false); setQuery(""); };
-  const showSearch = ["submissions", "bookings", "audience"].includes(page);
+  const showSearch = ["submissions", "bookings", "guestlist", "audience"].includes(page);
   return (
     <div className="admin">
       <aside className={`aside ${navOpen ? "open" : ""}`}>
@@ -385,6 +477,7 @@ export function AdminApp({ onExit }) {
           {page === "overview" && <Overview go={go} />}
           {page === "submissions" && <Submissions query={query} />}
           {page === "bookings" && <Bookings query={query} />}
+          {page === "guestlist" && <GuestList query={query} />}
           {page === "audience" && <Audience query={query} />}
           {page === "merch" && <Merch />}
           {page === "settings" && <Settings onReset={store.resetAll} />}
