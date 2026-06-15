@@ -297,8 +297,13 @@ function Settings({ onReset }) {
         ))}
       </div>
       <div className="set-card">
+        <h3>Guest-list emails</h3>
+        <p>When you approve a guest-list request, the fan is automatically emailed a confirmation. This runs through the <span className="mono" style={{ color: "var(--amute)" }}>/api/notify-guest</span> function — set <span className="mono" style={{ color: "var(--amute)" }}>RESEND_API_KEY</span> (and optionally <span className="mono" style={{ color: "var(--amute)" }}>GUEST_FROM</span>) in your Vercel project to switch it on. Until then, approvals still work — they just won't send mail.</p>
+        <div className="set-row"><span style={{ fontSize: 14 }}>Auto-email on approval</span><span className="mono" style={{ color: "var(--amute)", fontSize: 12 }}>Configure in Vercel</span></div>
+      </div>
+      <div className="set-card">
         <h3>Demo data</h3>
-        <p>This prototype stores submissions, bookings and subscribers locally so anything you submit on the public site appears here. Reset to the original sample set.</p>
+        <p>This prototype stores submissions, bookings, subscribers and guest-list requests locally so anything submitted on the public site appears here. Reset to the original sample set.</p>
         <button className="abtn danger" onClick={onReset}>Reset demo data</button>
       </div>
     </div>
@@ -307,10 +312,36 @@ function Settings({ onReset }) {
 
 /* ---------- GUEST LIST ---------- */
 const GUEST_STATUSES = ["Pending", "Approved", "Waitlist", "Declined"];
+
+// Best-effort approval email via the /api/notify-guest serverless function.
+// Never throws — returns a status the UI can surface gently.
+async function notifyApproved(g, ev) {
+  try {
+    const r = await fetch("/api/notify-guest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: g.name, email: g.email, eventName: ev.venue, eventCity: ev.city, eventDate: ev.date, guests: g.guests }),
+    });
+    if (!r.ok) return { sent: false, reason: "error" };
+    return await r.json().catch(() => ({ sent: false, reason: "error" }));
+  } catch (e) {
+    return { sent: false, reason: "no-endpoint" }; // e.g. local dev without the function
+  }
+}
+
 function GuestList({ query }) {
   const { guestlist, setGuestStatus, approvedFor } = useStore();
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(null);
+  const [notice, setNotice] = useState(null);
+  const approve = async (g, ev) => {
+    setGuestStatus(g.id, "Approved");
+    const res = await notifyApproved(g, ev);
+    if (res.sent) setNotice({ kind: "ok", msg: `Approved — confirmation emailed to ${g.name}.` });
+    else if (res.reason === "email-not-configured") setNotice({ kind: "info", msg: `${g.name} approved. Add RESEND_API_KEY in Vercel to auto-email confirmations.` });
+    else setNotice({ kind: "info", msg: `${g.name} approved. (Email service not reachable here.)` });
+  };
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(null), 6000); return () => clearTimeout(t); }, [notice]);
   const list = guestlist.filter((g) =>
     (filter === "All" || g.status === filter) &&
     (!query || (g.name + g.email + (tourById[g.eventId]?.venue || "")).toLowerCase().includes(query.toLowerCase())));
@@ -368,7 +399,7 @@ function GuestList({ query }) {
       {cur && ev && (
         <Drawer onClose={() => setOpen(null)} title={cur.name} sub={`${ev.venue} · ${fmtDate(ev.date)}`}
           foot={<>
-            <button className="abtn primary" onClick={() => setGuestStatus(cur.id, "Approved")}><Icon name="check" size={14} /> Approve</button>
+            <button className="abtn primary" onClick={() => approve(cur, ev)}><Icon name="check" size={14} /> Approve</button>
             <button className="abtn ghost" onClick={() => setGuestStatus(cur.id, "Waitlist")}>Waitlist</button>
             <button className="abtn danger" onClick={() => setGuestStatus(cur.id, "Declined")}>Decline</button>
           </>}>
@@ -389,6 +420,7 @@ function GuestList({ query }) {
           {cur.msg && <div className="dmsg"><div className="lab">Why them</div>{cur.msg}</div>}
         </Drawer>
       )}
+      {notice && <div className={`toast ${notice.kind}`}><Icon name="check" size={14} /> {notice.msg}</div>}
     </div>
   );
 }

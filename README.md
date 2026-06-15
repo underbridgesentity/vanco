@@ -11,6 +11,14 @@ Two halves of one loop:
 
 Each tour date holds a limited guest list (capacity set per event via `cap` in `SEED.tour`). Fans request a spot from the Tour section; requests flow into the admin **Guest List** page, which tracks approved heads against each show's cap and lets the team approve, waitlist or decline.
 
+When a request is **approved**, the fan is automatically emailed a confirmation via the [`api/notify-guest.js`](api/notify-guest.js) Vercel serverless function (using [Resend](https://resend.com)). It's safe by default — with no key configured, approvals still work and simply skip the email. To switch it on, set these in Vercel → Project → Settings → Environment Variables (see [`.env.example`](.env.example)):
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `RESEND_API_KEY` | yes | Resend API key — without it, no email is sent |
+| `GUEST_FROM` | no | Sender, e.g. `Vanco <guestlist@yourdomain.com>` (verify the domain in Resend) |
+| `GUEST_REPLY_TO` | no | Reply-to address (e.g. management inbox) |
+
 Anything submitted on the public site flows straight into admin — submissions, bookings and subscribers are persisted in the browser via `localStorage`, so the full loop is demonstrable end-to-end.
 
 ## Tech

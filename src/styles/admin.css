@@ -175,6 +175,13 @@
 .cap-banner { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 12px 14px; border-radius: 10px; margin-bottom: 22px; background: rgba(61,220,132,.1); border: 1px solid rgba(61,220,132,.3); color: #3ddc84; }
 .cap-banner.full { background: rgba(255,107,107,.1); border-color: rgba(255,107,107,.3); color: #ff8585; }
 
+/* approval toast */
+.toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); z-index: 1600; display: flex; align-items: center; gap: 9px; max-width: 92vw; padding: 13px 18px; border-radius: 10px; font-size: 13px; background: var(--apanel-2); border: 1px solid var(--aline); box-shadow: 0 18px 50px rgba(0,0,0,.5); animation: toastin .3s var(--ease); }
+.toast.ok { color: #3ddc84; border-color: rgba(61,220,132,.35); }
+.toast.info { color: #fff; }
+.toast svg { flex: none; }
+@keyframes toastin { from { opacity: 0; transform: translate(-50%, 12px); } }
+
 /* mobile admin */
 .aside-toggle { display: none; }
 @media(max-width:860px){
