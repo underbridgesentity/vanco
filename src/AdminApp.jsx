@@ -143,11 +143,11 @@ function Submissions({ query }) {
             <button className="abtn ghost" onClick={() => setSubStatus(cur.id, "Listened")}><Icon name="check" size={14} /> Mark listened</button>
             <button className="abtn danger" onClick={() => setSubStatus(cur.id, "Passed")}>Pass</button>
           </>}>
-          <div className="drawer-play">
+          <a className="drawer-play" href={cur.link ? httpify(cur.link) : undefined} target="_blank" rel="noreferrer" title="Open the submitted track" style={{ cursor: cur.link ? "pointer" : "default", textDecoration: "none" }}>
             <span className="pp"><Icon name="play" size={16} /></span>
             <span className="miniwave">{Array.from({ length: 30 }).map((_, i) => <i key={i} style={{ height: `${20 + Math.abs(Math.sin(i)) * 80}%`, animationDelay: `${i * 0.04}s` }} />)}</span>
-            <span className="mono" style={{ fontSize: 11, color: "var(--amute)" }}>PREVIEW</span>
-          </div>
+            <span className="mono" style={{ fontSize: 11, color: "var(--amute)" }}>OPEN ↗</span>
+          </a>
           <dl className="dl">
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Artist</dt><dd>{cur.artist}</dd>
