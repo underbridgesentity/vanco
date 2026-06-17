@@ -119,6 +119,7 @@
 .dmsg .lab { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--amute); margin-bottom: 10px; }
 .drawer-foot { padding: 20px 28px; border-top: 1px solid var(--aline); display: flex; gap: 10px; flex-wrap: wrap; }
 .abtn { font-family: var(--display); font-weight: 600; font-size: 13px; padding: 12px 18px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
+.abtn:disabled { opacity: .4; cursor: not-allowed; }
 .abtn.primary { background: var(--accent); color: var(--accent-ink); } .abtn.primary:hover { filter: brightness(1.08); }
 .abtn.ghost { border: 1px solid var(--aline); color: #fff; } .abtn.ghost:hover { background: var(--apanel-2); }
 .abtn.danger { border: 1px solid var(--aline); color: #ff8585; } .abtn.danger:hover { background: rgba(255,107,107,.1); }

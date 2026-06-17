@@ -2,7 +2,7 @@
    VANCO — public site
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, SEED, SPOTIFY, RA_TOUR, tourById, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
+import { Icon, SEED, SPOTIFY, RA_TOUR, SOCIALS, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
 import { ASSETS as A } from "./assets.js";
 
 const NAVLINKS = [
@@ -471,8 +471,28 @@ function MerchSection() {
 }
 
 /* ---------- FOOTER ---------- */
+function FooterSubscribe() {
+  const { addFan } = useStore();
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+  const submit = (e) => {
+    e.preventDefault();
+    if (!email) return;
+    addFan({ name: email.split("@")[0], email, country: "", tier: "Free", interests: ["New music", "Tour alerts"] });
+    setDone(true);
+  };
+  if (done) return <div className="foot-subbed"><Icon name="check" size={15} /> You’re on the list — watch your inbox.</div>;
+  return (
+    <form className="foot-mini" onSubmit={submit}>
+      <input type="email" required placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <button type="submit" aria-label="Subscribe"><Icon name="arrowR" size={16} /></button>
+    </form>
+  );
+}
+
 function Footer({ onAdmin }) {
   const go = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  const ext = { target: "_blank", rel: "noreferrer" };
   return (
     <footer className="footer">
       <div className="wrap">
@@ -487,27 +507,24 @@ function Footer({ onAdmin }) {
           </div>
           <div className="foot-col">
             <h5>Connect</h5>
-            <a href="#" onClick={(e) => e.preventDefault()}>Instagram</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>Spotify</a>
-            <a href="#" onClick={(e) => e.preventDefault()}>SoundCloud</a>
+            <a href={SOCIALS.instagram} {...ext}>Instagram</a>
+            <a href={SOCIALS.spotify} {...ext}>Spotify</a>
+            <a href={SOCIALS.soundcloud} {...ext}>SoundCloud</a>
             <a href="#" onClick={(e) => { e.preventDefault(); onAdmin(); }}>Admin</a>
           </div>
           <div className="foot-col">
             <h5>Join the list</h5>
             <p className="foot-blurb" style={{ marginBottom: 14 }}>Tickets first. New music first.</p>
-            <div className="foot-mini">
-              <input placeholder="your@email.com" onClick={(e) => e.preventDefault()} />
-              <button onClick={() => go("join")}><Icon name="arrowR" size={16} /></button>
-            </div>
+            <FooterSubscribe />
           </div>
         </div>
         <div className="foot-bottom">
           <span>© 2026 Vanco · ALGRA</span>
           <div className="foot-socials">
-            <a href="#" onClick={(e) => e.preventDefault()}><Icon name="instagram" size={18} /></a>
-            <a href="#" onClick={(e) => e.preventDefault()}><Icon name="spotify" size={18} /></a>
-            <a href="#" onClick={(e) => e.preventDefault()}><Icon name="soundcloud" size={18} /></a>
-            <a href="#" onClick={(e) => e.preventDefault()}><Icon name="youtube" size={18} /></a>
+            <a href={SOCIALS.instagram} {...ext} aria-label="Instagram"><Icon name="instagram" size={18} /></a>
+            <a href={SOCIALS.spotify} {...ext} aria-label="Spotify"><Icon name="spotify" size={18} /></a>
+            <a href={SOCIALS.soundcloud} {...ext} aria-label="SoundCloud"><Icon name="soundcloud" size={18} /></a>
+            <a href={SOCIALS.youtube} {...ext} aria-label="YouTube"><Icon name="youtube" size={18} /></a>
           </div>
           <span>Booking · ALGRA Management</span>
         </div>

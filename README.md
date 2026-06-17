@@ -60,14 +60,16 @@ src/
   (full track if the visitor is signed into Spotify, 30s preview otherwise). No
   hardcoded discography.
 - Forms persist to the browser locally so you can demo the flow — no real backend,
-  payments, or email yet.
-- **Tour** dates are placeholders awaiting the real schedule (in `SEED.tour`,
-  `src/store.jsx`).
+  payments, or email yet (except guest-list approval emails, above).
+- Social / streaming links (nav, footer, Music) point to Vanco's real profiles
+  (`SOCIALS` in `src/store.jsx`). The footer "join the list" box subscribes
+  straight into the Audience database.
+- Admin tables export to CSV (Submissions, Subscribers, Guest List); contact
+  emails are `mailto:` and submission links open the real stream.
 - **Merch** is hidden on the public site until products are live — re-enable
   `<MerchSection />` in `src/PublicSite.jsx` when ready.
-- Socials and ticket buttons are placeholders — wire them to real URLs when ready.
-- Suggested next steps: drop in the real tour dates and decide Inner Circle
-  pricing/perks.
+- Suggested next steps: decide Inner Circle pricing/perks, and (optionally) move
+  the local store behind a real backend for multi-device admin + history.
 
 To go live, the natural next layer is a backend (e.g. an API + database) behind the existing store interface in `src/store.jsx`, plus real auth on the admin view.
 

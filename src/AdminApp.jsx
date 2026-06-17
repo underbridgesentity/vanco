@@ -8,8 +8,32 @@ import { ASSETS } from "./assets.js";
 const AA = { wordW: ASSETS.wordW, monoW: ASSETS.monoW, monoB: ASSETS.monoB };
 const scClass = (s) => s.toLowerCase().replace(/\s+/g, "");
 const initials = (n) => n.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const mailto = (e) => `mailto:${e}`;
+const httpify = (u) => (/^https?:\/\//.test(u) ? u : `https://${u}`);
 
 function StatusChip({ s }) { return <span className={`sc ${scClass(s)}`}>{s}</span>; }
+
+/* Download an array of flat objects as a CSV file (Excel-friendly, BOM + CRLF). */
+function downloadCsv(filename, rows) {
+  if (!rows.length) return;
+  const cols = Object.keys(rows[0]);
+  const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csv = [cols.join(","), ...rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\r\n");
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* Lightweight transient toast for admin actions. */
+function useToast() {
+  const [notice, setNotice] = useState(null);
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(null), 5000); return () => clearTimeout(t); }, [notice]);
+  const node = notice ? <div className={`toast ${notice.kind || "info"}`}><Icon name={notice.icon || "check"} size={14} /> {notice.msg}</div> : null;
+  return [node, (msg, opts = {}) => setNotice({ msg, ...opts })];
+}
 
 /* ---------- OVERVIEW ---------- */
 function Overview({ go }) {
@@ -76,16 +100,21 @@ function Submissions({ query }) {
   const { submissions, setSubStatus } = useStore();
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(null);
+  const [toast, showToast] = useToast();
   const list = submissions.filter((s) =>
     (filter === "All" || s.status === filter) &&
     (!query || (s.artist + s.track + s.genre).toLowerCase().includes(query.toLowerCase())));
   const cur = submissions.find((s) => s.id === open);
+  const exportCsv = () => {
+    downloadCsv(`vanco-submissions-${todayStr()}.csv`, list.map((s) => ({ Artist: s.artist, Track: s.track, Genre: s.genre, Email: s.email, Label: s.label || "", Link: s.link, Status: s.status, Received: s.date })));
+    showToast(`Exported ${list.length} submission${list.length === 1 ? "" : "s"} to CSV.`, { kind: "ok" });
+  };
   return (
     <div>
       <div className="filterbar">
         {["All", ...SUB_STATUSES].map((f) => <button key={f} className={`fchip ${filter === f ? "on" : ""}`} onClick={() => setFilter(f)}>{f}{f !== "All" ? ` · ${submissions.filter((s) => s.status === f).length}` : ""}</button>)}
         <span className="spacer" />
-        <button className="abtn ghost"><Icon name="download" size={14} /> Export</button>
+        <button className="abtn ghost" onClick={exportCsv} disabled={!list.length}><Icon name="download" size={14} /> Export</button>
       </div>
       <div className="panel">
         <div className="tbl-wrap">
@@ -122,15 +151,16 @@ function Submissions({ query }) {
           <dl className="dl">
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Artist</dt><dd>{cur.artist}</dd>
-            <dt>Email</dt><dd>{cur.email}</dd>
+            <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
             <dt>Label</dt><dd>{cur.label || "—"}</dd>
             <dt>Genre</dt><dd>{cur.genre}</dd>
-            <dt>Link</dt><dd><a href="#" onClick={(e) => e.preventDefault()}>{cur.link}</a></dd>
+            <dt>Link</dt><dd>{cur.link ? <a href={httpify(cur.link)} target="_blank" rel="noreferrer">{cur.link}</a> : "—"}</dd>
             <dt>Received</dt><dd>{fmtFull(cur.date)}</dd>
           </dl>
           {cur.msg && <div className="dmsg"><div className="lab">Message</div>{cur.msg}</div>}
         </Drawer>
       )}
+      {toast}
     </div>
   );
 }
@@ -182,7 +212,7 @@ function Bookings({ query }) {
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Contact</dt><dd>{cur.name}</dd>
             <dt>Org</dt><dd>{cur.org || "—"}</dd>
-            <dt>Email</dt><dd><a href="#" onClick={(e) => e.preventDefault()}>{cur.email}</a></dd>
+            <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
             <dt>Date</dt><dd>{fmtFull(cur.date)}</dd>
             <dt>Location</dt><dd>{cur.city}</dd>
             <dt>Venue</dt><dd>{cur.venue || "—"}</dd>
@@ -198,9 +228,14 @@ function Bookings({ query }) {
 /* ---------- AUDIENCE ---------- */
 function Audience({ query }) {
   const { fans, fanTotal } = useStore();
+  const [toast, showToast] = useToast();
   const list = fans.filter((f) => !query || (f.name + f.email + f.country).toLowerCase().includes(query.toLowerCase()));
   const byRegion = [["South Africa", 38], ["Europe", 27], ["Americas", 14], ["Middle East", 11], ["Asia", 10]];
   const byInterest = [["New music", 92], ["Tour alerts", 78], ["Exclusive mixes", 54], ["Merch drops", 41]];
+  const exportCsv = () => {
+    downloadCsv(`vanco-subscribers-${todayStr()}.csv`, list.map((f) => ({ Name: f.name, Email: f.email, Country: f.country, Interests: (f.interests || []).join("; "), Tier: f.tier, Joined: f.date })));
+    showToast(`Exported ${list.length} subscriber${list.length === 1 ? "" : "s"} to CSV.`, { kind: "ok" });
+  };
   return (
     <div>
       <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
@@ -210,7 +245,7 @@ function Audience({ query }) {
       </div>
       <div className="aud-grid">
         <div className="panel">
-          <div className="panel-h"><h3>Subscribers</h3><button className="abtn ghost"><Icon name="download" size={14} /> Export CSV</button></div>
+          <div className="panel-h"><h3>Subscribers</h3><button className="abtn ghost" onClick={exportCsv} disabled={!list.length}><Icon name="download" size={14} /> Export CSV</button></div>
           <div className="tbl-wrap">
             <table className="tbl">
               <thead><tr><th>Name</th><th>Country</th><th>Interests</th><th>Tier</th><th>Joined</th></tr></thead>
@@ -240,6 +275,7 @@ function Audience({ query }) {
           </div>
         </div>
       </div>
+      {toast}
     </div>
   );
 }
@@ -251,12 +287,14 @@ const ADMIN_PRODUCTS = [
   { n: "Ma Tnsani — Vinyl", p: "$32", s: "Draft", stock: "500 planned" },
 ];
 function Merch() {
+  const [toast, showToast] = useToast();
+  const soon = () => showToast("The store isn’t live yet — product tools unlock at launch.", { kind: "info", icon: "bag" });
   return (
     <div>
       <div className="filterbar">
         <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--amute)", letterSpacing: ".06em" }}>STORE — NOT YET LIVE</span>
         <span className="spacer" />
-        <button className="abtn primary"><Icon name="plus" size={14} /> Add product</button>
+        <button className="abtn primary" onClick={soon}><Icon name="plus" size={14} /> Add product</button>
       </div>
       <div className="prod-grid">
         {ADMIN_PRODUCTS.map((p) => (
@@ -265,14 +303,15 @@ function Merch() {
             <div className="pbody">
               <div className="pn">{p.n}</div>
               <div className="pp">{p.p} · {p.stock} in stock</div>
-              <div className="prow"><span className="sc passed">{p.s}</span><button className="abtn ghost" style={{ padding: "8px 12px" }}>Edit</button></div>
+              <div className="prow"><span className="sc passed">{p.s}</span><button className="abtn ghost" style={{ padding: "8px 12px" }} onClick={soon}>Edit</button></div>
             </div>
           </div>
         ))}
-        <div className="prodcard" style={{ display: "grid", placeItems: "center", minHeight: 220, border: "1px dashed var(--aline)", background: "transparent", cursor: "pointer" }}>
+        <div className="prodcard" onClick={soon} style={{ display: "grid", placeItems: "center", minHeight: 220, border: "1px dashed var(--aline)", background: "transparent", cursor: "pointer" }}>
           <div style={{ textAlign: "center", color: "var(--amute)" }}><Icon name="plus" size={24} style={{ margin: "0 auto 10px" }} /><div style={{ fontSize: 13 }}>New product</div></div>
         </div>
       </div>
+      {toast}
     </div>
   );
 }
@@ -350,6 +389,13 @@ function GuestList({ query }) {
   const eventsWithReq = [...new Set(guestlist.map((g) => g.eventId))]
     .map((id) => tourById[id]).filter(Boolean)
     .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const exportCsv = () => {
+    downloadCsv(`vanco-guestlist-${todayStr()}.csv`, list.map((g) => {
+      const e = tourById[g.eventId] || {};
+      return { Guest: g.name, Email: g.email, Instagram: g.instagram || "", Party: g.guests, Event: e.venue || "", City: e.city || "", "Event date": e.date || "", Requested: g.date, Status: g.status };
+    }));
+    setNotice({ kind: "ok", msg: `Exported ${list.length} request${list.length === 1 ? "" : "s"} to CSV.` });
+  };
   return (
     <div>
       <div className="cap-grid">
@@ -371,7 +417,7 @@ function GuestList({ query }) {
       <div className="filterbar">
         {["All", ...GUEST_STATUSES].map((f) => <button key={f} className={`fchip ${filter === f ? "on" : ""}`} onClick={() => setFilter(f)}>{f}{f !== "All" ? ` · ${guestlist.filter((g) => g.status === f).length}` : ""}</button>)}
         <span className="spacer" />
-        <button className="abtn ghost"><Icon name="download" size={14} /> Export</button>
+        <button className="abtn ghost" onClick={exportCsv} disabled={!list.length}><Icon name="download" size={14} /> Export</button>
       </div>
       <div className="panel">
         <div className="tbl-wrap">
@@ -412,8 +458,8 @@ function GuestList({ query }) {
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Event</dt><dd>{ev.venue}, {ev.city}</dd>
             <dt>Date</dt><dd>{fmtFull(ev.date)}</dd>
-            <dt>Email</dt><dd><a href="#" onClick={(e) => e.preventDefault()}>{cur.email}</a></dd>
-            <dt>Instagram</dt><dd>{cur.instagram || "—"}</dd>
+            <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
+            <dt>Instagram</dt><dd>{cur.instagram ? <a href={`https://instagram.com/${cur.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer">{cur.instagram}</a> : "—"}</dd>
             <dt>Party size</dt><dd>{cur.guests} {cur.guests > 1 ? "people" : "person"}</dd>
             <dt>Requested</dt><dd>{fmtFull(cur.date)}</dd>
           </dl>

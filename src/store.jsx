@@ -80,6 +80,14 @@ export const SPOTIFY = {
 // Vanco's official Resident Advisor tour page — canonical, always-current ticket listings.
 export const RA_TOUR = "https://ra.co/dj/vanco/tour-dates";
 
+// Real social / streaming profiles — used by nav, footer and listen links.
+export const SOCIALS = {
+  instagram: "https://www.instagram.com/vanco_sa",
+  spotify: "https://open.spotify.com/artist/2KShewLkb92FKEZ6N4cVP9",
+  soundcloud: "https://soundcloud.com/vanco_sa",
+  youtube: "https://www.youtube.com/channel/UCV3quDD0_ElMIQ0Yh-f7Mgg",
+};
+
 /* ---------- seed data ---------- */
 export const SEED = {
   // 2026 tour. `tickets` = official link where known (otherwise the UI builds a
