@@ -10,7 +10,11 @@
      GUEST_FROM       optional — e.g. "Vanco <guestlist@yourdomain.com>"
                       (defaults to Resend's test sender for unverified domains)
      GUEST_REPLY_TO   optional — reply-to address (e.g. management email)
+
+   Requires a valid signed admin session (Authorization: Bearer <token>) so
+   it can't be abused as an open email relay.
    ============================================================ */
+import { verifyToken } from "../lib/auth.js";
 
 const esc = (s) =>
   String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
@@ -40,6 +44,10 @@ function emailHtml({ name, eventName, eventCity, eventDate, guests }) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  // Must come from a logged-in admin — blocks anonymous abuse of the mailer.
+  const bearer = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  if (!verifyToken(bearer)) return res.status(401).json({ sent: false, error: "unauthorized" });
 
   const { name, email, eventName, eventCity, eventDate, guests } = req.body || {};
   if (!email || !eventName) return res.status(400).json({ sent: false, error: "Missing email or event" });

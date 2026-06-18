@@ -8,6 +8,7 @@
      ADMIN_PASSWORD   the shared passcode for Vanco's team
    ============================================================ */
 import crypto from "node:crypto";
+import { signToken } from "../lib/auth.js";
 
 function safeEqual(a, b) {
   const ab = Buffer.from(String(a));
@@ -16,8 +17,27 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(ab, bb);
 }
 
+// Best-effort per-IP throttle. Lives in the warm instance's memory, so it
+// slows down a single attacker but isn't a hard limit across instances —
+// the real brute-force defenses are a long random ADMIN_PASSWORD and (later)
+// durable rate limiting via the backend. Tune as needed.
+const WINDOW_MS = 60_000;
+const MAX_ATTEMPTS = 8;
+const attempts = new Map();
+function rateLimited(ip) {
+  const now = Date.now();
+  const recent = (attempts.get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  attempts.set(ip, recent);
+  if (attempts.size > 5000) attempts.clear(); // crude memory cap
+  return recent.length > MAX_ATTEMPTS;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ ok: false, error: "Method not allowed" });
+
+  const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
+  if (rateLimited(ip)) return res.status(429).json({ ok: false, reason: "rate-limited" });
 
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return res.status(200).json({ ok: false, reason: "not-configured" });
@@ -27,7 +47,6 @@ export default async function handler(req, res) {
 
   if (!safeEqual(password, expected)) return res.status(401).json({ ok: false, reason: "invalid" });
 
-  // Opaque session marker. The admin holds no server-side data (it's a
-  // client-side console), so this just unlocks the UI for the session.
-  return res.status(200).json({ ok: true, token: crypto.randomUUID() });
+  // Signed, expiring session token — verifiable by other functions, not forgeable in the browser.
+  return res.status(200).json({ ok: true, token: signToken() });
 }

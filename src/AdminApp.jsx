@@ -356,9 +356,10 @@ const GUEST_STATUSES = ["Pending", "Approved", "Waitlist", "Declined"];
 // Never throws — returns a status the UI can surface gently.
 async function notifyApproved(g, ev) {
   try {
+    const token = localStorage.getItem("vanco_admin") || "";
     const r = await fetch("/api/notify-guest", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ name: g.name, email: g.email, eventName: ev.venue, eventCity: ev.city, eventDate: ev.date, guests: g.guests }),
     });
     if (!r.ok) return { sent: false, reason: "error" };
@@ -511,6 +512,7 @@ export function AdminLogin({ onSuccess, onCancel }) {
       if (devBypass()) return;
       setErr(
         data.reason === "not-configured" ? "Admin login isn’t set up yet — add ADMIN_PASSWORD in Vercel." :
+        data.reason === "rate-limited" ? "Too many attempts. Wait a minute and try again." :
         data.reason === "unreachable" ? "Couldn’t reach the login service. Try again." :
         "Incorrect password."
       );

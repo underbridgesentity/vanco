@@ -11,12 +11,32 @@ import { ASSETS } from "./assets.js";
 import "./styles/site.css";
 import "./styles/admin.css";
 
-const ADMIN_KEY = "vanco_admin"; // session token (presence = authenticated)
+const ADMIN_KEY = "vanco_admin"; // signed session token (presence + unexpired = authenticated)
+
+// Cheap client-side check of the token's expiry for UX (auto-logout). The real
+// authorization happens server-side on protected endpoints; this never decides
+// security on its own. Unparseable/legacy/dev tokens are treated as valid here.
+function adminSessionValid() {
+  const t = localStorage.getItem(ADMIN_KEY);
+  if (!t) return false;
+  const parts = t.split(".");
+  if (parts.length !== 2) return true;
+  try {
+    const { exp } = JSON.parse(atob(parts[0].replace(/-/g, "+").replace(/_/g, "/")));
+    return !exp || Date.now() < exp;
+  } catch {
+    return true;
+  }
+}
 
 function Root() {
   // Admin is reachable only via the #admin hash (no public link), then gated by a passcode.
   const [view, setView] = useState(() => (location.hash === "#admin" ? "admin" : localStorage.getItem("vanco_view") || "site"));
-  const [authed, setAuthed] = useState(() => !!localStorage.getItem(ADMIN_KEY));
+  const [authed, setAuthed] = useState(() => {
+    const ok = adminSessionValid();
+    if (!ok) localStorage.removeItem(ADMIN_KEY);
+    return ok;
+  });
 
   useEffect(() => {
     localStorage.setItem("vanco_view", view);

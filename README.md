@@ -13,11 +13,17 @@ The admin console is **not linked anywhere on the public site**. The team reache
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `ADMIN_PASSWORD` | yes | Shared team passcode for the admin console |
+| `ADMIN_PASSWORD` | yes | Shared team passcode — use a long, random value (16+ chars) |
+| `SESSION_SECRET` | no | Key used to sign session tokens (falls back to `ADMIN_PASSWORD`) |
 
-A "Log out" button in the admin sidebar clears the session. In local `npm run dev` (no serverless functions), the dev passcode is `admin`; that dev bypass is compiled **out** of production builds.
+On success the function returns a **signed, expiring (12h) session token** (HMAC) — it can't be forged in the browser, and protected endpoints (e.g. the approval mailer) verify it. The login is also **rate-limited** per IP (best-effort, in-memory). A "Log out" button in the admin sidebar clears the session. In local `npm run dev` (no serverless functions) the dev passcode is `admin`; that bypass is compiled **out** of production builds.
 
-> Note: this gates the admin **UI**. Because the prototype's data still lives in the browser (`localStorage`), it's not a hard security boundary — for true multi-user security, move the data behind a backend with real auth (the natural next step).
+**Hardening status**
+- Passcode validated server-side; never shipped in the bundle.
+- Session tokens are signed + expiring; the approval-email endpoint requires a valid admin session (no anonymous abuse).
+- Login throttled per IP. For durable, cross-instance rate limiting add Vercel KV / Upstash.
+
+> This gates the admin **UI** and protects the serverless endpoints. The prototype's *data* still lives in the browser (`localStorage`), so it isn't yet a hard multi-user boundary — moving data behind a backend with real auth is the next step (see below).
 
 ### Guest list
 
