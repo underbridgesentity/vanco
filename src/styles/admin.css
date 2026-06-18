@@ -160,6 +160,20 @@
 
 .empty { padding: 60px 20px; text-align: center; color: var(--amute); font-size: 14px; }
 
+/* admin login gate */
+.admin-login { min-height: 100vh; background: var(--void); display: grid; place-items: center; padding: 24px; color: #fff; }
+.al-card { width: 100%; max-width: 380px; display: flex; flex-direction: column; text-align: center; }
+.al-logo { width: 60px; margin: 0 auto 26px; opacity: .9; }
+.al-kicker { font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--mute-d); margin-bottom: 12px; }
+.al-card h1 { font-weight: 700; font-size: 40px; letter-spacing: -.02em; text-transform: uppercase; line-height: 1; }
+.al-card p { font-size: 14px; color: var(--mute-d); margin: 12px 0 28px; line-height: 1.5; }
+.al-input { font-family: var(--display); font-size: 16px; color: #fff; background: rgba(255,255,255,.04); border: 1px solid var(--line-d); border-radius: 10px; padding: 14px 16px; text-align: center; letter-spacing: .12em; transition: border-color .2s; }
+.al-input:focus { outline: none; border-color: var(--accent); }
+.al-err { color: #ff8585; font-size: 13px; margin-top: 12px; }
+.al-submit { justify-content: center; margin-top: 18px; padding: 14px; font-size: 14px; }
+.al-back { margin-top: 18px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--mute-d); font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; background: none; }
+.al-back:hover { color: #fff; }
+
 /* guest-list capacity cards */
 .cap-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
 .capcard { background: var(--apanel); border: 1px solid var(--aline); border-radius: 12px; padding: 16px 18px; }

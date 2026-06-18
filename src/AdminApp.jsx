@@ -492,6 +492,50 @@ function Drawer({ title, sub, children, foot, onClose }) {
   );
 }
 
+/* ---------- ADMIN LOGIN ---------- */
+// Password is checked by the /api/admin-login serverless function, so the
+// passcode lives only in Vercel env (ADMIN_PASSWORD), never in this bundle.
+export function AdminLogin({ onSuccess, onCancel }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!pw || busy) return;
+    setBusy(true); setErr("");
+    const devBypass = () => { if (import.meta.env.DEV && pw === "admin") { onSuccess("dev"); return true; } return false; };
+    try {
+      const r = await fetch("/api/admin-login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) });
+      const data = await r.json().catch(() => ({ ok: false, reason: "unreachable" }));
+      if (data.ok) { onSuccess(data.token || "1"); return; }
+      if (devBypass()) return;
+      setErr(
+        data.reason === "not-configured" ? "Admin login isn’t set up yet — add ADMIN_PASSWORD in Vercel." :
+        data.reason === "unreachable" ? "Couldn’t reach the login service. Try again." :
+        "Incorrect password."
+      );
+    } catch {
+      if (!devBypass()) setErr("Couldn’t reach the login service. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="admin-login">
+      <form className="al-card" onSubmit={submit}>
+        <img className="al-logo" src={AA.monoW} alt="VANCO" />
+        <div className="al-kicker mono">Team access</div>
+        <h1>Admin</h1>
+        <p>This area is private. Enter the team passcode to continue.</p>
+        <input className="al-input" type="password" autoFocus value={pw} placeholder="Passcode" onChange={(e) => { setPw(e.target.value); setErr(""); }} />
+        {err && <div className="al-err">{err}</div>}
+        <button className="abtn primary al-submit" type="submit" disabled={busy}>{busy ? "Checking…" : "Enter admin"} <Icon name="arrowR" size={15} /></button>
+        <button className="al-back" type="button" onClick={onCancel}><Icon name="arrowL" size={14} /> Back to site</button>
+      </form>
+    </div>
+  );
+}
+
 /* ---------- ADMIN ROOT ---------- */
 const NAV = [
   ["overview", "Overview", "grid"],
@@ -502,7 +546,7 @@ const NAV = [
   ["merch", "Merch", "bag"],
   ["settings", "Settings", "settings"],
 ];
-export function AdminApp({ onExit }) {
+export function AdminApp({ onExit, onLogout }) {
   const store = useStore();
   const [page, setPage] = useState("overview");
   const [query, setQuery] = useState("");
@@ -536,6 +580,7 @@ export function AdminApp({ onExit }) {
         </nav>
         <div className="aside-foot">
           <button onClick={onExit}><Icon name="arrowL" size={16} /> View public site</button>
+          {onLogout && <button onClick={onLogout}><Icon name="x" size={16} /> Log out</button>}
           <div className="aprofile"><span className="av">V</span><div><div className="nm">Vanco</div><div className="rl">Owner · ALGRA</div></div></div>
         </div>
       </aside>

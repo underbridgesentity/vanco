@@ -10,7 +10,7 @@ const NAVLINKS = [
 ];
 
 /* ---------- NAV ---------- */
-function Nav({ active, onAdmin, playing }) {
+function Nav({ active }) {
   const [onHero, setOnHero] = useState(true);
   const [onLight, setOnLight] = useState(false);
   const [open, setOpen] = useState(false);
@@ -490,7 +490,7 @@ function FooterSubscribe() {
   );
 }
 
-function Footer({ onAdmin }) {
+function Footer() {
   const go = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   const ext = { target: "_blank", rel: "noreferrer" };
   return (
@@ -510,7 +510,7 @@ function Footer({ onAdmin }) {
             <a href={SOCIALS.instagram} {...ext}>Instagram</a>
             <a href={SOCIALS.spotify} {...ext}>Spotify</a>
             <a href={SOCIALS.soundcloud} {...ext}>SoundCloud</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); onAdmin(); }}>Admin</a>
+            <a href={SOCIALS.youtube} {...ext}>YouTube</a>
           </div>
           <div className="foot-col">
             <h5>Join the list</h5>
@@ -553,7 +553,7 @@ function PlayerBar({ open, onClose }) {
 }
 
 /* ---------- PUBLIC SITE ROOT ---------- */
-export function PublicSite({ onAdmin, heroImg }) {
+export function PublicSite({ heroImg }) {
   const [playing, setPlaying] = useState(false);
   const [active, setActive] = useState("top");
   const togglePlay = () => setPlaying((p) => !p);
@@ -567,7 +567,7 @@ export function PublicSite({ onAdmin, heroImg }) {
   }, []);
   return (
     <div>
-      <Nav active={active} onAdmin={onAdmin} />
+      <Nav active={active} />
       <Hero onPlay={togglePlay} heroImg={heroImg} />
       <MusicSection />
       <TourSection />
@@ -576,7 +576,7 @@ export function PublicSite({ onAdmin, heroImg }) {
       <BookSection />
       <JoinSection />
       {/* Merch hidden until products are live — re-enable <MerchSection /> when ready. */}
-      <Footer onAdmin={onAdmin} />
+      <Footer />
       <PlayerBar open={playing} onClose={() => setPlaying(false)} />
     </div>
   );
