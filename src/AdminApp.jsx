@@ -550,6 +550,8 @@ const NAV = [
 ];
 export function AdminApp({ onExit, onLogout }) {
   const store = useStore();
+  // Load the data from Neon when the console opens (and once mode is known).
+  useEffect(() => { store.loadAdmin(); }, [store.mode]);
   const [page, setPage] = useState("overview");
   const [query, setQuery] = useState("");
   const [navOpen, setNavOpen] = useState(false);

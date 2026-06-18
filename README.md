@@ -86,10 +86,28 @@ src/
   emails are `mailto:` and submission links open the real stream.
 - **Merch** is hidden on the public site until products are live — re-enable
   `<MerchSection />` in `src/PublicSite.jsx` when ready.
-- Suggested next steps: decide Inner Circle pricing/perks, and (optionally) move
-  the local store behind a real backend for multi-device admin + history.
+- Suggested next steps: decide Inner Circle pricing/perks.
 
-To go live, the natural next layer is a backend (e.g. an API + database) behind the existing store interface in `src/store.jsx`, plus real auth on the admin view.
+## Backend (Neon)
+
+The app talks to serverless API functions backed by **Neon (serverless Postgres)**. The data layer auto-detects its mode at startup:
+
+- **`api` mode** — when `DATABASE_URL` is set, all data lives in Neon. The public can **submit** (promos, bookings, guest requests, subscribes); only an **authenticated admin** can read or manage it. Authorization is enforced server-side on every read/write (`requireAdmin`), so the admin data is genuinely protected.
+- **`local` mode** — with no `DATABASE_URL` (local dev, or before you provision the DB), it falls back to `localStorage` so nothing breaks.
+
+### One-time setup
+1. Create a free project at [neon.tech](https://neon.tech).
+2. In the Neon **SQL editor**, run [`schema.sql`](schema.sql) (creates the tables).
+3. In Vercel → Project → Settings → Environment Variables, add **`DATABASE_URL`** (Neon's pooled connection string). Optionally set `SESSION_SECRET`.
+4. Redeploy. The app flips to `api` mode automatically.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | yes (for live data) | Neon connection string |
+
+API routes (`api/`): `submissions`, `bookings`, `guests`, `subscribers` (public `POST`; admin `GET`/`PATCH`), `stats` (public counts), `admin-login`, `notify-guest`.
+
+> Auth note: admin access still uses the shared passcode + signed session. For per-person team logins, add an auth provider (e.g. Clerk) in front of the admin — the API functions already verify a session, so that's a drop-in upgrade.
 
 ---
 

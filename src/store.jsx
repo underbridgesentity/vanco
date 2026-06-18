@@ -157,7 +157,13 @@ export const SEED = {
 // Quick lookup from event id → tour entry (for guest-list views).
 export const tourById = Object.fromEntries(SEED.tour.map((t) => [t.id, t]));
 
-/* ---------- store w/ localStorage persistence ---------- */
+/* ---------- store: API-backed (Neon) with localStorage fallback ----------
+   Mode is decided once at startup by probing /api/stats:
+     • "api"   — DATABASE_URL is live → data lives in Neon; public can submit,
+                 only authenticated admins can read/manage.
+     • "local" — no backend (local dev or before Neon is configured) → the
+                 original localStorage behaviour, so the app never breaks.
+   The useStore() interface is identical in both modes.                      */
 const KEY = "vanco_platform_v2";
 const DEFAULT_STORE = { submissions: SEED.submissions, bookings: SEED.bookings, fans: SEED.fans, guestlist: SEED.guestlist };
 function loadStore() {
@@ -171,38 +177,103 @@ function persist(s) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
 }
 
+const authHeaders = () => { const t = localStorage.getItem("vanco_admin"); return t ? { Authorization: `Bearer ${t}` } : {}; };
+async function apiJson(url, opts = {}) {
+  const r = await fetch(url, opts);
+  const ct = r.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) throw new Error("non-json");
+  const data = await r.json();
+  if (!r.ok) throw Object.assign(new Error(data.error || "api-error"), { status: r.status });
+  return data;
+}
+
 const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
 
 export function StoreProvider({ children }) {
-  const init = loadStore();
-  const [submissions, setSubmissions] = useState(init.submissions);
-  const [bookings, setBookings] = useState(init.bookings);
-  const [fans, setFans] = useState(init.fans);
-  const [guestlist, setGuestlist] = useState(init.guestlist);
-
-  useEffect(() => { persist({ submissions, bookings, fans, guestlist }); }, [submissions, bookings, fans, guestlist]);
+  const [mode, setMode] = useState("loading"); // 'loading' | 'api' | 'local'
+  const [submissions, setSubmissions] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [fans, setFans] = useState([]);
+  const [guestlist, setGuestlist] = useState([]);
+  const [subCount, setSubCount] = useState(0);
 
   const today = () => new Date().toISOString().slice(0, 10);
   const uid = (p) => p + Math.random().toString(36).slice(2, 8);
 
-  const addSubmission = (d) => setSubmissions((x) => [{ id: uid("s"), status: "New", date: today(), _new: true, ...d }, ...x]);
-  const addBooking = (d) => setBookings((x) => [{ id: uid("b"), status: "New", created: today(), _new: true, ...d }, ...x]);
-  const addFan = (d) => setFans((x) => [{ id: uid("f"), date: today(), _new: true, ...d }, ...x]);
-  const addGuest = (d) => setGuestlist((x) => [{ id: uid("g"), status: "Pending", date: today(), _new: true, ...d }, ...x]);
-  const setSubStatus = (id, status) => setSubmissions((x) => x.map((s) => s.id === id ? { ...s, status } : s));
-  const setBookStatus = (id, status) => setBookings((x) => x.map((b) => b.id === id ? { ...b, status } : b));
-  const setGuestStatus = (id, status) => setGuestlist((x) => x.map((g) => g.id === id ? { ...g, status } : g));
-  const resetAll = () => { setSubmissions(SEED.submissions); setBookings(SEED.bookings); setFans(SEED.fans); setGuestlist(SEED.guestlist); };
+  async function fetchAdminLists() {
+    const [s, b, g, f] = await Promise.all([
+      apiJson("/api/submissions", { headers: authHeaders() }),
+      apiJson("/api/bookings", { headers: authHeaders() }),
+      apiJson("/api/guests", { headers: authHeaders() }),
+      apiJson("/api/subscribers", { headers: authHeaders() }),
+    ]);
+    setSubmissions(s); setBookings(b); setGuestlist(g); setFans(f);
+  }
+
+  // Decide mode and hydrate once.
+  useEffect(() => {
+    let off = false;
+    (async () => {
+      try {
+        const stats = await apiJson("/api/stats");
+        if (off) return;
+        setSubCount(stats.subscribers || 0);
+        if (localStorage.getItem("vanco_admin")) { try { await fetchAdminLists(); } catch {} }
+        if (!off) setMode("api");
+      } catch {
+        if (off) return;
+        const init = loadStore();
+        setSubmissions(init.submissions); setBookings(init.bookings); setFans(init.fans); setGuestlist(init.guestlist);
+        setMode("local");
+      }
+    })();
+    return () => { off = true; };
+  }, []);
+
+  // Persist to localStorage only in local mode.
+  useEffect(() => { if (mode === "local") persist({ submissions, bookings, fans, guestlist }); }, [mode, submissions, bookings, fans, guestlist]);
+
+  // Pull admin lists when the console opens (covers logging in mid-session).
+  const loadAdmin = () => { if (mode === "api") fetchAdminLists().catch(() => {}); };
+
+  // ----- writes: optimistic; persisted to Neon (api) or localStorage (local) -----
+  const addVia = async (resource, d, optimistic, setter) => {
+    if (mode === "api") {
+      try {
+        const row = await apiJson(`/api/${resource}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+        setter((x) => [{ ...row, _new: true }, ...x]);
+        return;
+      } catch {}
+    }
+    setter((x) => [optimistic, ...x]);
+  };
+  const addSubmission = (d) => addVia("submissions", d, { id: uid("s"), status: "New", date: today(), _new: true, ...d }, setSubmissions);
+  const addBooking = (d) => addVia("bookings", d, { id: uid("b"), status: "New", created: today(), _new: true, ...d }, setBookings);
+  const addFan = (d) => addVia("subscribers", d, { id: uid("f"), date: today(), _new: true, ...d }, setFans).then(() => { if (mode === "api") setSubCount((c) => c + 1); });
+  const addGuest = (d) => addVia("guests", d, { id: uid("g"), status: "Pending", date: today(), _new: true, ...d }, setGuestlist);
+
+  const patchStatus = (resource, id, status) => {
+    if (mode === "api") apiJson(`/api/${resource}`, { method: "PATCH", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ id, status }) }).catch(() => {});
+  };
+  const setSubStatus = (id, status) => { setSubmissions((x) => x.map((s) => s.id === id ? { ...s, status } : s)); patchStatus("submissions", id, status); };
+  const setBookStatus = (id, status) => { setBookings((x) => x.map((b) => b.id === id ? { ...b, status } : b)); patchStatus("bookings", id, status); };
+  const setGuestStatus = (id, status) => { setGuestlist((x) => x.map((g) => g.id === id ? { ...g, status } : g)); patchStatus("guests", id, status); };
+
+  // Demo reset only applies to local mode (Neon is the source of truth in api mode).
+  const resetAll = () => {
+    if (mode === "api") { fetchAdminLists().catch(() => {}); return; }
+    setSubmissions(SEED.submissions); setBookings(SEED.bookings); setFans(SEED.fans); setGuestlist(SEED.guestlist);
+  };
 
   // Heads approved for an event (sums party sizes), used against each event's cap.
   const approvedFor = (eventId) => guestlist
     .filter((g) => g.eventId === eventId && g.status === "Approved")
     .reduce((n, g) => n + (Number(g.guests) || 1), 0);
 
-  const fanTotal = SEED.fanBase + fans.length;
+  const fanTotal = SEED.fanBase + (mode === "api" ? subCount : fans.length);
 
-  const value = { submissions, bookings, fans, guestlist, fanTotal, addSubmission, addBooking, addFan, addGuest, setSubStatus, setBookStatus, setGuestStatus, approvedFor, resetAll };
+  const value = { mode, submissions, bookings, fans, guestlist, fanTotal, loadAdmin, addSubmission, addBooking, addFan, addGuest, setSubStatus, setBookStatus, setGuestStatus, approvedFor, resetAll };
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
