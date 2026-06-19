@@ -1,4 +1,4 @@
-/* Audience / newsletter — public POST (subscribe), admin GET (list). */
+/* Audience / newsletter - public POST (subscribe), admin GET (list). */
 import { sql, requireDb } from "../lib/db.js";
 import { requireAdmin, dstr } from "../lib/api.js";
 

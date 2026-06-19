@@ -1,5 +1,5 @@
 /* ============================================================
-   VANCO PLATFORM — app root
+   VANCO PLATFORM - app root
    Public site <-> admin control room, with persistent local store.
    ============================================================ */
 import React, { useState, useEffect } from "react";

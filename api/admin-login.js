@@ -1,5 +1,5 @@
 /* ============================================================
-   Vercel serverless function — admin password check.
+   Vercel serverless function - admin password check.
 
    Validates the team passcode against the ADMIN_PASSWORD env var, which
    lives only on the server (never shipped in the public site bundle).
@@ -18,7 +18,7 @@ function safeEqual(a, b) {
 }
 
 // Best-effort per-IP throttle. Lives in the warm instance's memory, so it
-// slows down a single attacker but isn't a hard limit across instances —
+// slows down a single attacker but isn't a hard limit across instances -
 // the real brute-force defenses are a long random ADMIN_PASSWORD and (later)
 // durable rate limiting via the backend. Tune as needed.
 const WINDOW_MS = 60_000;
@@ -47,6 +47,6 @@ export default async function handler(req, res) {
 
   if (!safeEqual(password, expected)) return res.status(401).json({ ok: false, reason: "invalid" });
 
-  // Signed, expiring session token — verifiable by other functions, not forgeable in the browser.
+  // Signed, expiring session token - verifiable by other functions, not forgeable in the browser.
   return res.status(200).json({ ok: true, token: signToken() });
 }

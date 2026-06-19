@@ -1,4 +1,4 @@
-/* Central asset registry — Vite fingerprints these imports and returns final URLs,
+/* Central asset registry - Vite fingerprints these imports and returns final URLs,
    so references work under any deploy base path. */
 import monoWhite from "./assets/mono-white.png";
 import monoBlack from "./assets/mono-black.png";

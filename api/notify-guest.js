@@ -1,15 +1,15 @@
 /* ============================================================
-   Vercel serverless function — guest-list approval email.
+   Vercel serverless function - guest-list approval email.
 
    Sends a "you're on the guest list" email via Resend when the admin
    approves a request. Safe by default: with no RESEND_API_KEY set it
    simply reports "not configured" so approvals never break.
 
    Setup (Vercel → Project → Settings → Environment Variables):
-     RESEND_API_KEY   required — your Resend API key (https://resend.com)
-     GUEST_FROM       optional — e.g. "Vanco <guestlist@yourdomain.com>"
+     RESEND_API_KEY   required - your Resend API key (https://resend.com)
+     GUEST_FROM       optional - e.g. "Vanco <guestlist@yourdomain.com>"
                       (defaults to Resend's test sender for unverified domains)
-     GUEST_REPLY_TO   optional — reply-to address (e.g. management email)
+     GUEST_REPLY_TO   optional - reply-to address (e.g. management email)
 
    Requires a valid signed admin session (Authorization: Bearer <token>) so
    it can't be abused as an open email relay.
@@ -45,7 +45,7 @@ function emailHtml({ name, eventName, eventCity, eventDate, guests }) {
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Must come from a logged-in admin — blocks anonymous abuse of the mailer.
+  // Must come from a logged-in admin - blocks anonymous abuse of the mailer.
   const bearer = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
   if (!verifyToken(bearer)) return res.status(401).json({ sent: false, error: "unauthorized" });
 
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         from,
         to: [email],
-        subject: `You're on the guest list — ${eventName}`,
+        subject: `You're on the guest list - ${eventName}`,
         html: emailHtml({ name, eventName, eventCity, eventDate, guests }),
         ...(process.env.GUEST_REPLY_TO ? { reply_to: process.env.GUEST_REPLY_TO } : {}),
       }),

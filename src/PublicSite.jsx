@@ -1,5 +1,5 @@
 /* ============================================================
-   VANCO — public site
+   VANCO - public site
    ============================================================ */
 import React, { useState, useEffect } from "react";
 import { Icon, SPOTIFY, RA_TOUR, SOCIALS, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
@@ -69,7 +69,7 @@ function Hero({ onPlay, heroImg }) {
       <img className="hero-mono" src={A.monoW} alt="" aria-hidden="true" />
       <div className="hero-in">
         <h1>Rhythm<br />without<br /><span className="o">borders</span></h1>
-        <p className="hero-sub">DJ and producer blending Afro house, melodic techno and tribal electronic rhythms — rooted in African spirit, designed for every dancefloor on earth.</p>
+        <p className="hero-sub">DJ and producer blending Afro house, melodic techno and tribal electronic rhythms, rooted in African spirit and designed for every dancefloor on earth.</p>
         <div className="hero-cta">
           <button className="btn btn-fill btn-lg" onClick={onPlay}>
             <Icon name="play" size={15} /> Play latest
@@ -81,7 +81,7 @@ function Hero({ onPlay, heroImg }) {
 }
 
 /* ---------- MUSIC ---------- */
-// Feeds live from Vanco's Spotify artist profile — always his real, current
+// Feeds live from Vanco's Spotify artist profile - always his real, current
 // catalogue (latest releases + top tracks), playable in-page.
 function MusicSection() {
   return (
@@ -89,7 +89,7 @@ function MusicSection() {
       <div className="wrap">
         <Reveal className="shead">
           <div>
-            <div className="idx">(01) — Discography</div>
+            <div className="idx">(01) - Discography</div>
             <h2>Music</h2>
           </div>
           <a className="btn btn-fill on-light" href={SPOTIFY.artistUrl} target="_blank" rel="noreferrer">
@@ -106,7 +106,7 @@ function MusicSection() {
           />
         </Reveal>
         <Reveal className="spotify-note mono" as="div">
-          Live from Vanco’s Spotify — always the latest releases &amp; top tracks. Press play to listen.
+          Live from Vanco’s Spotify, always the latest releases &amp; top tracks. Press play to listen.
         </Reveal>
       </div>
     </section>
@@ -128,11 +128,11 @@ function TourSection() {
       <div className="wrap">
         <Reveal className="shead">
           <div>
-            <div className="idx">(02) — 2026 Season</div>
+            <div className="idx">(02) - 2026 Season</div>
             <h2>Tour</h2>
           </div>
           <div style={{ maxWidth: 360 }}>
-            <p style={{ color: "var(--mute-d)", fontSize: 14.5, lineHeight: 1.5, marginBottom: 14 }}>Summer 2026 across Europe and North Africa. Every show holds a limited guest list — request your spot below.</p>
+            <p style={{ color: "var(--mute-d)", fontSize: 14.5, lineHeight: 1.5, marginBottom: 14 }}>Summer 2026 across Europe and North Africa. Every show holds a limited guest list, so request your spot below.</p>
             <a className="ra-link mono" href={RA_TOUR} target="_blank" rel="noreferrer">All dates &amp; tickets on Resident Advisor <Icon name="arrowUR" size={14} className="mv" /></a>
           </div>
         </Reveal>
@@ -194,7 +194,7 @@ function GuestListModal({ event, onClose }) {
           <div className="sent" style={{ padding: "32px 12px" }}>
             <div className="ck"><Icon name="check" size={32} /></div>
             <h4>You’re on the list</h4>
-            <p>Request received for <b>{event.venue}</b>, {event.city}. Spots are limited — we’ll email you if you’re confirmed.</p>
+            <p>Request received for <b>{event.venue}</b>, {event.city}. Spots are limited, so we’ll email you if you’re confirmed.</p>
             <button className="btn btn-ghost" onClick={onClose}>Done</button>
           </div>
         ) : (
@@ -234,17 +234,17 @@ function AboutSection() {
     <section className="sec light sec-pad" id="about" data-screen-label="About">
       <div className="wrap">
         <Reveal className="shead">
-          <div><div className="idx">(03) — Biography</div><h2>About</h2></div>
+          <div><div className="idx">(03) - Biography</div><h2>About</h2></div>
         </Reveal>
         <div className="about-grid">
           <Reveal className="about-portrait">
             <img src={A.hat} alt="Vanco portrait" />
-            <span className="cap">Vanco — 2026</span>
+            <span className="cap">Vanco - 2026</span>
           </Reveal>
           <Reveal className="about-body" delay={120}>
-            <p className="lead">Rooted in African spirit and designed for the world — music that moves between soulful and cinematic.</p>
-            <p>From Douglasdale, Johannesburg, Vanco has performed at the most respected venues on earth — Tomorrowland Dubai, Ushuaïa, Blue Marlin Ibiza, Fabric London and Ultra South Africa among them.</p>
-            <p>In 2025, ‘Ma Tnsani’ feat. Aya became a global phenomenon — 80M+ streams, the #1 most Shazammed track of the Ibiza season — supported by Black Coffee, Keinemusik, Louie Vega, Pete Tong and Mahmut Orhan.</p>
+            <p className="lead">Rooted in African spirit and designed for the world. Music that moves between soulful and cinematic.</p>
+            <p>From Douglasdale, Johannesburg, Vanco has performed at the most respected venues on earth: Tomorrowland Dubai, Ushuaïa, Blue Marlin Ibiza, Fabric London and Ultra South Africa among them.</p>
+            <p>In 2025, ‘Ma Tnsani’ feat. Aya became a global phenomenon: 80M+ streams, the #1 most Shazammed track of the Ibiza season, supported by Black Coffee, Keinemusik, Louie Vega, Pete Tong and Mahmut Orhan.</p>
             <div className="suprow">
               <div className="lab">Supported by</div>
               <div className="supchips">
@@ -262,7 +262,7 @@ function AboutSection() {
         <Reveal className="statline">
           <div className="st"><div className="n">80M+</div><div className="l">Global streams</div></div>
           <div className="st"><div className="n">6</div><div className="l">Continents toured</div></div>
-          <div className="st"><div className="n">#1</div><div className="l">Shazam — Ibiza 2025</div></div>
+          <div className="st"><div className="n">#1</div><div className="l">Shazam - Ibiza 2025</div></div>
         </Reveal>
       </div>
     </section>
@@ -297,17 +297,17 @@ function SubmitSection() {
       <div className="wrap">
         <Reveal className="split">
           <div className="lhs">
-            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(04) — A&R</div>
+            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(04) - A&R</div>
             <h3>Submit a promo</h3>
-            <p>Sending music for Vanco to play and for ALGRA — the label backing emerging Afro-electronic talent. Every track is heard. Real ones get played out on the road.</p>
+            <p>Sending music for Vanco to play and for ALGRA, the label backing emerging Afro-electronic talent. Every track is heard. Real ones get played out on the road.</p>
             <div className="feats">
-              <div><Icon name="check" size={16} /> Personally reviewed — no inbox black hole</div>
+              <div><Icon name="check" size={16} /> Personally reviewed, no inbox black hole</div>
               <div><Icon name="check" size={16} /> Standout tracks tested in live sets</div>
               <div><Icon name="check" size={16} /> Signing opportunities via ALGRA</div>
             </div>
           </div>
           <div className="rhs">
-            {sent ? <Sent title="Promo received" msg="Your track is in the queue. If it connects, you’ll hear from the team — keep an eye on your inbox." onReset={() => { setSent(false); setF({ artist: "", email: "", track: "", link: "", genre: "Afro House", label: "", msg: "" }); }} />
+            {sent ? <Sent title="Promo received" msg="Your track is in the queue. If it connects, you’ll hear from the team, so keep an eye on your inbox." onReset={() => { setSent(false); setF({ artist: "", email: "", track: "", link: "", genre: "Afro House", label: "", msg: "" }); }} />
               : (
                 <form className="form-grid" onSubmit={submit}>
                   <Field label="Artist / act name"><input required value={f.artist} onChange={set("artist")} placeholder="Your name" /></Field>
@@ -347,17 +347,17 @@ function BookSection() {
       <div className="wrap">
         <Reveal className="split">
           <div className="lhs">
-            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(05) — Bookings</div>
+            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(05) - Bookings</div>
             <h3>Book Vanco</h3>
-            <p>Festivals, clubs, brand activations and private events worldwide. Tell us about the show — the booking team responds within 48 hours.</p>
+            <p>Festivals, clubs, brand activations and private events worldwide. Tell us about the show, and the booking team responds within 48 hours.</p>
             <div className="feats">
               <div><Icon name="globe" size={16} /> Touring Europe, Africa, Middle East, Asia</div>
               <div><Icon name="globe" size={16} /> 2026 opening up Australasia & the Americas</div>
-              <div><Icon name="mail" size={16} /> Direct line to management — no middlemen</div>
+              <div><Icon name="mail" size={16} /> Direct line to management, no middlemen</div>
             </div>
           </div>
           <div className="rhs">
-            {sent ? <Sent title="Inquiry sent" msg="Thanks — the booking team has your details and will be in touch within 48 hours to talk dates and logistics." onReset={() => { setSent(false); setF({ name: "", email: "", org: "", event: "", date: "", city: "", venue: "", type: "Festival", budget: "", msg: "" }); }} />
+            {sent ? <Sent title="Inquiry sent" msg="Thanks. The booking team has your details and will be in touch within 48 hours to talk dates and logistics." onReset={() => { setSent(false); setF({ name: "", email: "", org: "", event: "", date: "", city: "", venue: "", type: "Festival", budget: "", msg: "" }); }} />
               : (
                 <form className="form-grid" onSubmit={submit}>
                   <Field label="Your name"><input required value={f.name} onChange={set("name")} placeholder="Full name" /></Field>
@@ -366,7 +366,7 @@ function BookSection() {
                   <Field label="Event name"><input required value={f.event} onChange={set("event")} placeholder="Event / show" /></Field>
                   <Field label="Event date"><input required type="date" value={f.date} onChange={set("date")} /></Field>
                   <Field label="City / country"><input required value={f.city} onChange={set("city")} placeholder="City, country" /></Field>
-                  <Field label="Venue & capacity"><input value={f.venue} onChange={set("venue")} placeholder="Venue — capacity" /></Field>
+                  <Field label="Venue & capacity"><input value={f.venue} onChange={set("venue")} placeholder="Venue - capacity" /></Field>
                   <Field label="Budget (USD)"><input value={f.budget} onChange={set("budget")} placeholder="Range or on request" /></Field>
                   <Field label="Event type" full>
                     <div className="chips">
@@ -401,7 +401,7 @@ function JoinSection() {
       <div className="wrap">
         <Reveal className="split">
           <div className="lhs">
-            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(06) — The List</div>
+            <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(06) - The List</div>
             <h3>Join the<br />inner circle</h3>
             <p>One signal cuts through the noise. Get tour tickets before anyone, unreleased music, exclusive mixes and first dibs on merch.</p>
             <div className="feats">
@@ -447,13 +447,13 @@ function JoinSection() {
 }
 
 /* ---------- MERCH ---------- */
-const PRODUCTS = [["Borders Tour Tee", "From $45"], ["V Monogram Cap", "$38"], ["Ma Tnsani — Vinyl", "$32"]];
+const PRODUCTS = [["Borders Tour Tee", "From $45"], ["V Monogram Cap", "$38"], ["Ma Tnsani - Vinyl", "$32"]];
 function MerchSection() {
   return (
     <section className="sec light sec-pad" id="merch" data-screen-label="Merch">
       <div className="wrap">
         <Reveal className="shead">
-          <div><div className="idx">(07) — Store</div><h2>Merch</h2></div>
+          <div><div className="idx">(07) - Store</div><h2>Merch</h2></div>
           <span className="pill" style={{ borderColor: "var(--line-l)" }}><Icon name="dot" size={9} /> Dropping soon</span>
         </Reveal>
         <div className="merch-grid">
@@ -482,7 +482,7 @@ function FooterSubscribe() {
     addFan({ name: email.split("@")[0], email, country: "", tier: "Free", interests: ["New music", "Tour alerts"] });
     setDone(true);
   };
-  if (done) return <div className="foot-subbed"><Icon name="check" size={15} /> You’re on the list — watch your inbox.</div>;
+  if (done) return <div className="foot-subbed"><Icon name="check" size={15} /> You’re on the list. Watch your inbox.</div>;
   return (
     <form className="foot-mini" onSubmit={submit}>
       <input type="email" required placeholder="your@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -500,7 +500,7 @@ function Footer() {
         <div className="foot-top">
           <div>
             <div className="foot-logo"><img src={A.wordW} alt="VANCO" /></div>
-            <p className="foot-blurb">Rhythm travels without borders. Afro house, melodic techno and tribal electronic — from Johannesburg to the world.</p>
+            <p className="foot-blurb">Rhythm travels without borders. Afro house, melodic techno and tribal electronic, from Johannesburg to the world.</p>
           </div>
           <div className="foot-col">
             <h5>Explore</h5>
@@ -535,7 +535,7 @@ function Footer() {
 }
 
 /* ---------- PLAYER BAR ---------- */
-// Docks the official Spotify player for the featured single — real audio in-page
+// Docks the official Spotify player for the featured single - real audio in-page
 // (full track if the visitor is signed into Spotify, 30s preview otherwise).
 function PlayerBar({ open, onClose }) {
   if (!open) return null;
@@ -576,7 +576,7 @@ export function PublicSite({ heroImg }) {
       <SubmitSection />
       <BookSection />
       <JoinSection />
-      {/* Merch hidden until products are live — re-enable <MerchSection /> when ready. */}
+      {/* Merch hidden until products are live - re-enable <MerchSection /> when ready. */}
       <Footer />
       <PlayerBar open={playing} onClose={() => setPlaying(false)} />
     </div>

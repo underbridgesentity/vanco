@@ -1,5 +1,5 @@
 -- ============================================================
--- Vanco platform — Neon/Postgres schema.
+-- Vanco platform - Neon/Postgres schema.
 -- Run once in the Neon SQL editor (or `psql $DATABASE_URL -f schema.sql`).
 -- Safe to re-run: every statement is IF NOT EXISTS.
 -- ============================================================

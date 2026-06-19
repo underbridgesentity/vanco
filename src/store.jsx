@@ -1,5 +1,5 @@
 /* ============================================================
-   VANCO PLATFORM — shared store, primitives, icons
+   VANCO PLATFORM - shared store, primitives, icons
    ============================================================ */
 import React, {
   useState,
@@ -66,7 +66,7 @@ export const PLATFORMS = [
 
 /* Vanco's real Spotify identity. The site feeds from his artist profile via the
    official Spotify embed, so the catalogue always reflects what's live on Spotify
-   (latest releases + popular tracks) — no hardcoded track lists to go stale. */
+   (latest releases + popular tracks) - no hardcoded track lists to go stale. */
 export const SPOTIFY = {
   artistId: "2KShewLkb92FKEZ6N4cVP9",
   artistUrl: "https://open.spotify.com/artist/2KShewLkb92FKEZ6N4cVP9",
@@ -77,10 +77,10 @@ export const SPOTIFY = {
   featuredFeat: "feat. AYA",
 };
 
-// Vanco's official Resident Advisor tour page — canonical, always-current ticket listings.
+// Vanco's official Resident Advisor tour page - canonical, always-current ticket listings.
 export const RA_TOUR = "https://ra.co/dj/vanco/tour-dates";
 
-// Real social / streaming profiles — used by nav, footer and listen links.
+// Real social / streaming profiles - used by nav, footer and listen links.
 export const SOCIALS = {
   instagram: "https://www.instagram.com/vanco_sa",
   spotify: "https://open.spotify.com/artist/2KShewLkb92FKEZ6N4cVP9",
@@ -95,7 +95,7 @@ export const SEED = {
   // (0 / omitted = no guest list, e.g. private bookings).
   tour: [
     { id: "t1", date: "2026-06-01", city: "Ibiza", country: "ES", venue: "Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events-calendar", cap: 20 },
-    { id: "t2", date: "2026-06-05", city: "Monte Carlo", country: "MC", venue: "Nikki Beach — F1 Grand Prix", region: "Europe", status: "Tickets", cap: 15 },
+    { id: "t2", date: "2026-06-05", city: "Monte Carlo", country: "MC", venue: "Nikki Beach - F1 Grand Prix", region: "Europe", status: "Tickets", cap: 15 },
     { id: "t3", date: "2026-06-06", city: "Monte Carlo", country: "MC", venue: "Private Party", region: "Europe", status: "Private" },
     { id: "t4", date: "2026-06-07", city: "Ibiza", country: "ES", venue: "Mestiza · Hï Ibiza", region: "Europe", status: "Tickets", tickets: "https://www.hiibiza.com/events/2026/mestiza", cap: 20 },
     { id: "t5", date: "2026-06-12", city: "Porto Cervo", country: "IT", venue: "Twiga · Sardinia", region: "Europe", status: "Tickets", cap: 18 },
@@ -121,17 +121,17 @@ export const SEED = {
     { id: "t25", date: "2026-07-30", city: "Tunis", country: "TN", venue: "Calypso", region: "Africa", status: "Tickets", cap: 20 },
   ],
   submissions: [
-    { id: "s1", artist: "Kioko", track: "Midnight in Maputo", genre: "Afro House", email: "kioko@mail.com", label: "—", link: "soundcloud.com/kioko/midnight", msg: "Long-time fan. Built this around a marimba loop — would love your ears on it.", status: "New", date: "2026-05-29" },
+    { id: "s1", artist: "Kioko", track: "Midnight in Maputo", genre: "Afro House", email: "kioko@mail.com", label: "-", link: "soundcloud.com/kioko/midnight", msg: "Long-time fan. Built this around a marimba loop - would love your ears on it.", status: "New", date: "2026-05-29" },
     { id: "s2", artist: "ANROK", track: "Cobalt", genre: "Melodic Techno", email: "hello@anrok.live", label: "Independent", link: "soundcloud.com/anrok/cobalt-priv", msg: "Peak-time roller, 122bpm. Open to ALGRA.", status: "Shortlist", date: "2026-05-27" },
-    { id: "s3", artist: "Nina Sol", track: "Umoya", genre: "Afro House", email: "nina@solmusic.co", label: "—", link: "soundcloud.com/ninasol/umoya", msg: "Vocal by my sister, recorded in Soweto.", status: "New", date: "2026-05-26" },
-    { id: "s4", artist: "Lebo Jr", track: "Spirit Drum", genre: "Tribal", email: "lebojr@mail.com", label: "—", link: "soundcloud.com/lebojr/spirit", msg: "Tribal percussion edit, hoping for a Tomorrowland test.", status: "Listened", date: "2026-05-24" },
-    { id: "s5", artist: "TKZ", track: "Lowveld", genre: "Afro Tech", email: "tkz@mail.com", label: "—", link: "soundcloud.com/tkz/lowveld", msg: "First track. Be honest!", status: "Passed", date: "2026-05-20" },
+    { id: "s3", artist: "Nina Sol", track: "Umoya", genre: "Afro House", email: "nina@solmusic.co", label: "-", link: "soundcloud.com/ninasol/umoya", msg: "Vocal by my sister, recorded in Soweto.", status: "New", date: "2026-05-26" },
+    { id: "s4", artist: "Lebo Jr", track: "Spirit Drum", genre: "Tribal", email: "lebojr@mail.com", label: "-", link: "soundcloud.com/lebojr/spirit", msg: "Tribal percussion edit, hoping for a Tomorrowland test.", status: "Listened", date: "2026-05-24" },
+    { id: "s5", artist: "TKZ", track: "Lowveld", genre: "Afro Tech", email: "tkz@mail.com", label: "-", link: "soundcloud.com/tkz/lowveld", msg: "First track. Be honest!", status: "Passed", date: "2026-05-20" },
   ],
   bookings: [
-    { id: "b1", name: "Mara Ionescu", org: "Sunwaves Festival", event: "SW Summer 2026", email: "talent@sunwaves.ro", date: "2026-08-15", city: "Mamaia, RO", venue: "Beachfront — 18,000", type: "Festival", budget: "$40k–60k", msg: "Sunset slot, Saturday main stage.", status: "Reviewing", created: "2026-05-30" },
-    { id: "b2", name: "Daniel Cho", org: "Hï Ibiza", event: "Residency night", email: "bookings@hiibiza.com", date: "2026-07-26", city: "Ibiza, ES", venue: "Theatre — 1,500", type: "Club", budget: "On request", msg: "2-hour closing set.", status: "New", created: "2026-05-31" },
-    { id: "b3", name: "Aïsha Bello", org: "Private", event: "Beach wedding", email: "aisha.b@mail.com", date: "2026-09-20", city: "Mauritius", venue: "Private villa — 200", type: "Private", budget: "$25k", msg: "Two-hour sunset set for a private celebration.", status: "New", created: "2026-05-31" },
-    { id: "b4", name: "Mixmag SA", org: "Mixmag", event: "Lab Live SA S2", email: "lab@mixmag.co.za", date: "2026-10-10", city: "Johannesburg, ZA", venue: "Studio — stream", type: "Brand", budget: "$15k", msg: "Return for season two of the Lab.", status: "Confirmed", created: "2026-05-22" },
+    { id: "b1", name: "Mara Ionescu", org: "Sunwaves Festival", event: "SW Summer 2026", email: "talent@sunwaves.ro", date: "2026-08-15", city: "Mamaia, RO", venue: "Beachfront - 18,000", type: "Festival", budget: "$40k-60k", msg: "Sunset slot, Saturday main stage.", status: "Reviewing", created: "2026-05-30" },
+    { id: "b2", name: "Daniel Cho", org: "Hï Ibiza", event: "Residency night", email: "bookings@hiibiza.com", date: "2026-07-26", city: "Ibiza, ES", venue: "Theatre - 1,500", type: "Club", budget: "On request", msg: "2-hour closing set.", status: "New", created: "2026-05-31" },
+    { id: "b3", name: "Aïsha Bello", org: "Private", event: "Beach wedding", email: "aisha.b@mail.com", date: "2026-09-20", city: "Mauritius", venue: "Private villa - 200", type: "Private", budget: "$25k", msg: "Two-hour sunset set for a private celebration.", status: "New", created: "2026-05-31" },
+    { id: "b4", name: "Mixmag SA", org: "Mixmag", event: "Lab Live SA S2", email: "lab@mixmag.co.za", date: "2026-10-10", city: "Johannesburg, ZA", venue: "Studio - stream", type: "Brand", budget: "$15k", msg: "Return for season two of the Lab.", status: "Confirmed", created: "2026-05-22" },
   ],
   fans: [
     { id: "f1", name: "Thandi M.", email: "thandi@mail.com", country: "South Africa", interests: ["Tour alerts", "New music"], date: "2026-05-31", tier: "Free" },
@@ -144,23 +144,23 @@ export const SEED = {
     { id: "f8", name: "Amara N.", email: "amara@mail.ng", country: "Nigeria", interests: ["New music", "Exclusive mixes"], date: "2026-05-28", tier: "Inner Circle" },
   ],
   guestlist: [
-    { id: "g1", eventId: "t9", name: "Sofia Marais", email: "sofia@mail.com", instagram: "@sofiam", guests: 2, msg: "Huge fan — would love to bring my sister to the Ministry show.", status: "Pending", date: "2026-06-10" },
+    { id: "g1", eventId: "t9", name: "Sofia Marais", email: "sofia@mail.com", instagram: "@sofiam", guests: 2, msg: "Huge fan - would love to bring my sister to the Ministry show.", status: "Pending", date: "2026-06-10" },
     { id: "g2", eventId: "t1", name: "Léa Dubois", email: "lea@mail.fr", instagram: "@lea.d", guests: 1, msg: "", status: "Approved", date: "2026-05-28" },
-    { id: "g3", eventId: "t9", name: "Tom Blake", email: "tom@mail.uk", instagram: "", guests: 2, msg: "Following since Ma Tnsani — first time catching a set.", status: "Pending", date: "2026-06-11" },
+    { id: "g3", eventId: "t9", name: "Tom Blake", email: "tom@mail.uk", instagram: "", guests: 2, msg: "Following since Ma Tnsani - first time catching a set.", status: "Pending", date: "2026-06-11" },
     { id: "g4", eventId: "t20", name: "Andrei Pop", email: "andrei@mail.ro", instagram: "@andrei.p", guests: 1, msg: "Travelling from Bucharest for Tomorrowland.", status: "Waitlist", date: "2026-06-09" },
     { id: "g5", eventId: "t15", name: "Marie Laurent", email: "marie@mail.fr", instagram: "@marie.l", guests: 2, msg: "", status: "Pending", date: "2026-06-12" },
     { id: "g6", eventId: "t1", name: "Diego Fernández", email: "diego@mail.es", instagram: "@dfernandez", guests: 1, msg: "Local to Ibiza, never miss a Vanco night.", status: "Approved", date: "2026-05-26" },
   ],
-  fanBase: 0, // real data only — subscriber total comes straight from the database
+  fanBase: 0, // real data only - subscriber total comes straight from the database
 };
 
 // Quick lookup from event id → tour entry (for guest-list views).
 
 /* ---------- store: API-backed (Neon) with localStorage fallback ----------
    Mode is decided once at startup by probing /api/stats:
-     • "api"   — DATABASE_URL is live → data lives in Neon; public can submit,
+     • "api"   - DATABASE_URL is live → data lives in Neon; public can submit,
                  only authenticated admins can read/manage.
-     • "local" — no backend (local dev or before Neon is configured) → the
+     • "local" - no backend (local dev or before Neon is configured) → the
                  original localStorage behaviour, so the app never breaks.
    The useStore() interface is identical in both modes.                      */
 const KEY = "vanco_platform_v2";

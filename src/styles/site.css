@@ -1,5 +1,5 @@
 /* ============================================================
-   VANCO — core tokens + public site
+   VANCO - core tokens + public site
    ============================================================ */
 :root {
   --void: #050506;
@@ -123,7 +123,7 @@ section[data-screen-label] { scroll-margin-top: 76px; }
    ========================================================= */
 .hero { min-height: 100svh; position: relative; display: flex; align-items: flex-end; overflow: hidden; background: var(--void); }
 /* Full-bleed cinematic background. The portrait is vertical, so on wide screens
-   cover crops it to a band and centres the subject horizontally — the gradient
+   cover crops it to a band and centres the subject horizontally - the gradient
    darkens the left so the headline stays legible over the image. */
 .hero-bg { position: absolute; inset: 0; z-index: 0; }
 .hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 68% 22%; opacity: .95; }
@@ -153,7 +153,7 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 @keyframes eq { 0%,100%{ height:3px } 50%{ height:14px } }
 
 /* =========================================================
-   SPOTIFY FEED (Music section — live from artist profile)
+   SPOTIFY FEED (Music section - live from artist profile)
    ========================================================= */
 .spotify-feed { border: 1px solid var(--line-l); border-radius: 14px; overflow: hidden; background: #121212; box-shadow: 0 24px 60px -30px rgba(0,0,0,.4); }
 .spotify-feed iframe { display: block; width: 100%; height: 520px; border: 0; }
@@ -380,14 +380,14 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 .pb-spotify:hover { color: #1db954; }
 .pb-time { font-size: 12px; color: var(--mute-d); }
 .pb-x { color: var(--mute-d); transition: color .2s; } .pb-x:hover { color: #fff; }
-/* Spotify embed mode — official player docks full-width at the bottom */
+/* Spotify embed mode - official player docks full-width at the bottom */
 .playerbar.spotify { display: flex; align-items: center; background: rgba(10,10,12,.96); padding: 0; }
 .playerbar.spotify iframe { flex: 1; display: block; border: 0; min-width: 0; }
 .playerbar.spotify .pb-x-embed { padding: 0 18px; flex: none; }
 @media(max-width:720px){ .pb-links, .pb-time, .pb-spotify { display: none; } .pb-in { gap: 12px; padding: 12px 18px; } }
 
 /* =========================================================
-   SMALL-SCREEN PASS — tighten gutters & stack for phones
+   SMALL-SCREEN PASS - tighten gutters & stack for phones
    ========================================================= */
 @media (max-width: 700px) {
   .wrap { padding: 0 20px; }

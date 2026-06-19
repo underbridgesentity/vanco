@@ -1,4 +1,4 @@
-/* Guest-list requests — public POST, admin GET / PATCH (status). */
+/* Guest-list requests - public POST, admin GET / PATCH (status). */
 import { sql, requireDb } from "../lib/db.js";
 import { requireAdmin, dstr } from "../lib/api.js";
 

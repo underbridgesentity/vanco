@@ -1,5 +1,5 @@
 /* ============================================================
-   VANCO — admin app
+   VANCO - admin app
    ============================================================ */
 import React, { useState, useEffect } from "react";
 import { Icon, PLATFORMS, useStore, fmtDate, fmtFull } from "./store.jsx";
@@ -49,16 +49,16 @@ function Overview({ go }) {
   const countries = new Set(fans.map((f) => f.country).filter(Boolean)).size;
   const feed = [
     ...submissions.slice(0, 4).map((s) => ({ ic: "music", t: <><b>{s.artist}</b> submitted “{s.track}”</>, d: `${s.genre} · ${fmtDate(s.date)}`, _d: s.date })),
-    ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> — {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
-    ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{eventById[g.eventId] ? ` — ${eventById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
-    ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " — Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
+    ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> - {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
+    ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{eventById[g.eventId] ? ` - ${eventById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
+    ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " - Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
   ].sort((a, b) => (a._d < b._d ? 1 : -1)).slice(0, 8);
   const pipeline = [["Submissions", submissions.length], ["Bookings", bookings.length], ["Guest list", guestlist.length], ["Subscribers", fans.length]];
   const pmax = Math.max(1, ...pipeline.map((p) => p[1]));
   const cards = [
     { ic: "inbox", n: newSubs, l: "New submissions", d: `${submissions.length} total in queue`, go: "submissions" },
     { ic: "calendar", n: pendBook, l: "Open bookings", d: `${bookings.length} total`, go: "bookings" },
-    { ic: "users", n: fanTotal.toLocaleString(), l: "Subscribers", d: countries ? `${countries} ${countries === 1 ? "country" : "countries"}` : "—", go: "audience" },
+    { ic: "users", n: fanTotal.toLocaleString(), l: "Subscribers", d: countries ? `${countries} ${countries === 1 ? "country" : "countries"}` : "-", go: "audience" },
     { ic: "star", n: inner, l: "Inner Circle", d: "Paid tier", go: "audience" },
   ];
   return (
@@ -157,9 +157,9 @@ function Submissions({ query }) {
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Artist</dt><dd>{cur.artist}</dd>
             <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
-            <dt>Label</dt><dd>{cur.label || "—"}</dd>
+            <dt>Label</dt><dd>{cur.label || "-"}</dd>
             <dt>Genre</dt><dd>{cur.genre}</dd>
-            <dt>Link</dt><dd>{cur.link ? <a href={httpify(cur.link)} target="_blank" rel="noreferrer">{cur.link}</a> : "—"}</dd>
+            <dt>Link</dt><dd>{cur.link ? <a href={httpify(cur.link)} target="_blank" rel="noreferrer">{cur.link}</a> : "-"}</dd>
             <dt>Received</dt><dd>{fmtFull(cur.date)}</dd>
           </dl>
           {cur.msg && <div className="dmsg"><div className="lab">Message</div>{cur.msg}</div>}
@@ -216,11 +216,11 @@ function Bookings({ query }) {
           <dl className="dl">
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Contact</dt><dd>{cur.name}</dd>
-            <dt>Org</dt><dd>{cur.org || "—"}</dd>
+            <dt>Org</dt><dd>{cur.org || "-"}</dd>
             <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
             <dt>Date</dt><dd>{fmtFull(cur.date)}</dd>
             <dt>Location</dt><dd>{cur.city}</dd>
-            <dt>Venue</dt><dd>{cur.venue || "—"}</dd>
+            <dt>Venue</dt><dd>{cur.venue || "-"}</dd>
             <dt>Budget</dt><dd>{cur.budget}</dd>
           </dl>
           {cur.msg && <div className="dmsg"><div className="lab">Details</div>{cur.msg}</div>}
@@ -293,17 +293,17 @@ function Audience({ query }) {
 
 /* ---------- MERCH ---------- */
 const ADMIN_PRODUCTS = [
-  { n: "Borders Tour Tee", p: "$45", s: "Draft", stock: "—" },
-  { n: "V Monogram Cap", p: "$38", s: "Draft", stock: "—" },
-  { n: "Ma Tnsani — Vinyl", p: "$32", s: "Draft", stock: "500 planned" },
+  { n: "Borders Tour Tee", p: "$45", s: "Draft", stock: "-" },
+  { n: "V Monogram Cap", p: "$38", s: "Draft", stock: "-" },
+  { n: "Ma Tnsani - Vinyl", p: "$32", s: "Draft", stock: "500 planned" },
 ];
 function Merch() {
   const [toast, showToast] = useToast();
-  const soon = () => showToast("The store isn’t live yet — product tools unlock at launch.", { kind: "info", icon: "bag" });
+  const soon = () => showToast("The store isn’t live yet - product tools unlock at launch.", { kind: "info", icon: "bag" });
   return (
     <div>
       <div className="filterbar">
-        <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--amute)", letterSpacing: ".06em" }}>STORE — NOT YET LIVE</span>
+        <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--amute)", letterSpacing: ".06em" }}>STORE - NOT YET LIVE</span>
         <span className="spacer" />
         <button className="abtn primary" onClick={soon}><Icon name="plus" size={14} /> Add product</button>
       </div>
@@ -348,7 +348,7 @@ function Settings({ onReset }) {
       </div>
       <div className="set-card">
         <h3>Guest-list emails</h3>
-        <p>When you approve a guest-list request, the fan is automatically emailed a confirmation. This runs through the <span className="mono" style={{ color: "var(--amute)" }}>/api/notify-guest</span> function — set <span className="mono" style={{ color: "var(--amute)" }}>RESEND_API_KEY</span> (and optionally <span className="mono" style={{ color: "var(--amute)" }}>GUEST_FROM</span>) in your Vercel project to switch it on. Until then, approvals still work — they just won't send mail.</p>
+        <p>When you approve a guest-list request, the fan is automatically emailed a confirmation. This runs through the <span className="mono" style={{ color: "var(--amute)" }}>/api/notify-guest</span> function - set <span className="mono" style={{ color: "var(--amute)" }}>RESEND_API_KEY</span> (and optionally <span className="mono" style={{ color: "var(--amute)" }}>GUEST_FROM</span>) in your Vercel project to switch it on. Until then, approvals still work - they just won't send mail.</p>
         <div className="set-row"><span style={{ fontSize: 14 }}>Auto-email on approval</span><span className="mono" style={{ color: "var(--amute)", fontSize: 12 }}>Configure in Vercel</span></div>
       </div>
       <div className="set-card">
@@ -389,13 +389,13 @@ function TourAdmin() {
                   <td className="muted">{e.city}{e.country ? `, ${e.country}` : ""}</td>
                   <td className="muted">{e.region}</td>
                   <td><StatusChip s={e.status} /></td>
-                  <td className="mono muted">{e.cap ? `${approvedFor(e.id)} / ${e.cap}` : "—"}</td>
+                  <td className="mono muted">{e.cap ? `${approvedFor(e.id)} / ${e.cap}` : "-"}</td>
                   <td><Icon name="chevron" size={16} style={{ color: "var(--amute)" }} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {events.length === 0 && <div className="empty">No dates yet — add the first show.</div>}
+          {events.length === 0 && <div className="empty">No dates yet - add the first show.</div>}
         </div>
       </div>
       {editing && <EventEditor event={editing} onClose={() => setEditing(null)} onDone={done} />}
@@ -416,7 +416,7 @@ function EventEditor({ event, onClose, onDone }) {
     e.preventDefault();
     const payload = { ...f, cap: Number(f.cap) || 0 };
     if (isNew) await addEvent(payload); else await updateEvent(event.id, payload);
-    onDone(isNew ? "Date added — it’s live on the site." : "Date updated.");
+    onDone(isNew ? "Date added - it’s live on the site." : "Date updated.");
   };
   const remove = async () => { await deleteEvent(event.id); onDone("Date removed."); };
   return (
@@ -443,7 +443,7 @@ function EventEditor({ event, onClose, onDone }) {
 const GUEST_STATUSES = ["Pending", "Approved", "Waitlist", "Declined"];
 
 // Best-effort approval email via the /api/notify-guest serverless function.
-// Never throws — returns a status the UI can surface gently.
+// Never throws - returns a status the UI can surface gently.
 async function notifyApproved(g, ev) {
   try {
     const token = localStorage.getItem("vanco_admin") || "";
@@ -467,7 +467,7 @@ function GuestList({ query }) {
   const approve = async (g, ev) => {
     setGuestStatus(g.id, "Approved");
     const res = await notifyApproved(g, ev);
-    if (res.sent) setNotice({ kind: "ok", msg: `Approved — confirmation emailed to ${g.name}.` });
+    if (res.sent) setNotice({ kind: "ok", msg: `Approved - confirmation emailed to ${g.name}.` });
     else if (res.reason === "email-not-configured") setNotice({ kind: "info", msg: `${g.name} approved. Add RESEND_API_KEY in Vercel to auto-email confirmations.` });
     else setNotice({ kind: "info", msg: `${g.name} approved. (Email service not reachable here.)` });
   };
@@ -520,7 +520,7 @@ function GuestList({ query }) {
                 return (
                   <tr key={g.id} className={g._new ? "row-new" : ""} onClick={() => setOpen(g.id)}>
                     <td><div className="cellflex"><span className="tav">{initials(g.name)}</span><div><div className="strong">{g.name}</div><div className="cellsub">{g.email}</div></div></div></td>
-                    <td><div>{e?.venue || "—"}</div><div className="cellsub">{e ? `${fmtDate(e.date)} · ${e.city}` : ""}</div></td>
+                    <td><div>{e?.venue || "-"}</div><div className="cellsub">{e ? `${fmtDate(e.date)} · ${e.city}` : ""}</div></td>
                     <td className="muted">{g.guests} {g.guests > 1 ? "people" : "person"}</td>
                     <td className="mono muted">{fmtDate(g.date)}</td>
                     <td><StatusChip s={g.status} /></td>
@@ -543,14 +543,14 @@ function GuestList({ query }) {
           {(() => {
             const approved = approvedFor(ev.id);
             const full = approved >= (ev.cap || 0);
-            return <div className={`cap-banner ${full ? "full" : ""}`}><Icon name={full ? "x" : "check"} size={14} /> {approved} / {ev.cap} approved{full ? " — at capacity" : ` · ${ev.cap - approved} spot${ev.cap - approved === 1 ? "" : "s"} left`}</div>;
+            return <div className={`cap-banner ${full ? "full" : ""}`}><Icon name={full ? "x" : "check"} size={14} /> {approved} / {ev.cap} approved{full ? " - at capacity" : ` · ${ev.cap - approved} spot${ev.cap - approved === 1 ? "" : "s"} left`}</div>;
           })()}
           <dl className="dl">
             <dt>Status</dt><dd><StatusChip s={cur.status} /></dd>
             <dt>Event</dt><dd>{ev.venue}, {ev.city}</dd>
             <dt>Date</dt><dd>{fmtFull(ev.date)}</dd>
             <dt>Email</dt><dd><a href={mailto(cur.email)}>{cur.email}</a></dd>
-            <dt>Instagram</dt><dd>{cur.instagram ? <a href={`https://instagram.com/${cur.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer">{cur.instagram}</a> : "—"}</dd>
+            <dt>Instagram</dt><dd>{cur.instagram ? <a href={`https://instagram.com/${cur.instagram.replace(/^@/, "")}`} target="_blank" rel="noreferrer">{cur.instagram}</a> : "-"}</dd>
             <dt>Party size</dt><dd>{cur.guests} {cur.guests > 1 ? "people" : "person"}</dd>
             <dt>Requested</dt><dd>{fmtFull(cur.date)}</dd>
           </dl>
@@ -601,7 +601,7 @@ export function AdminLogin({ onSuccess, onCancel }) {
       if (data.ok) { onSuccess(data.token || "1"); return; }
       if (devBypass()) return;
       setErr(
-        data.reason === "not-configured" ? "Admin login isn’t set up yet — add ADMIN_PASSWORD in Vercel." :
+        data.reason === "not-configured" ? "Admin login isn’t set up yet - add ADMIN_PASSWORD in Vercel." :
         data.reason === "rate-limited" ? "Too many attempts. Wait a minute and try again." :
         data.reason === "unreachable" ? "Couldn’t reach the login service. Try again." :
         "Incorrect password."
@@ -651,12 +651,12 @@ export function AdminApp({ onExit, onLogout }) {
   const pendGuests = store.guestlist.filter((g) => g.status === "Pending").length;
   const counts = { submissions: newSubs, bookings: newBooks, guestlist: pendGuests };
   const titles = {
-    overview: ["Overview", "Control room — everything at a glance"],
-    submissions: ["Submissions", "Promo & demo inbox — A&R for ALGRA"],
+    overview: ["Overview", "Control room - everything at a glance"],
+    submissions: ["Submissions", "Promo & demo inbox - A&R for ALGRA"],
     bookings: ["Bookings", "Inbound show & event inquiries"],
     tour: ["Tour", "Manage the dates shown on the public site"],
-    guestlist: ["Guest List", "Per-show guest list — requests & capacity"],
-    audience: ["Audience", "The database — fans & subscribers"],
+    guestlist: ["Guest List", "Per-show guest list - requests & capacity"],
+    audience: ["Audience", "The database - fans & subscribers"],
     merch: ["Merch", "Store & product management"],
     settings: ["Settings", "Platform configuration"],
   };

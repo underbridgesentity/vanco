@@ -1,4 +1,4 @@
-/* Tour events — public GET (list, auto-seeds the 2026 dates on first read),
+/* Tour events - public GET (list, auto-seeds the 2026 dates on first read),
    admin POST / PATCH / DELETE. Drives the public Tour section and the
    guest-list event references. */
 import crypto from "node:crypto";

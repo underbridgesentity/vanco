@@ -1,4 +1,4 @@
-/* Public aggregate counts (no personal data) — powers the "X already in" total. */
+/* Public aggregate counts (no personal data) - powers the "X already in" total. */
 import { sql, requireDb } from "../lib/db.js";
 
 export default async function handler(req, res) {

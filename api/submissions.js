@@ -1,4 +1,4 @@
-/* Promo submissions — public POST (submit), admin GET (list) / PATCH (status). */
+/* Promo submissions - public POST (submit), admin GET (list) / PATCH (status). */
 import { sql, requireDb } from "../lib/db.js";
 import { requireAdmin, dstr } from "../lib/api.js";
 

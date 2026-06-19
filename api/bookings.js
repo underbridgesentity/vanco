@@ -1,4 +1,4 @@
-/* Booking inquiries — public POST, admin GET / PATCH (status). */
+/* Booking inquiries - public POST, admin GET / PATCH (status). */
 import { sql, requireDb } from "../lib/db.js";
 import { requireAdmin, dstr } from "../lib/api.js";
 
