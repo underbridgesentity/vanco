@@ -151,7 +151,7 @@ export const SEED = {
     { id: "g5", eventId: "t15", name: "Marie Laurent", email: "marie@mail.fr", instagram: "@marie.l", guests: 2, msg: "", status: "Pending", date: "2026-06-12" },
     { id: "g6", eventId: "t1", name: "Diego Fernández", email: "diego@mail.es", instagram: "@dfernandez", guests: 1, msg: "Local to Ibiza, never miss a Vanco night.", status: "Approved", date: "2026-05-26" },
   ],
-  fanBase: 24716, // baseline count the recent list sits on top of
+  fanBase: 0, // real data only — subscriber total comes straight from the database
 };
 
 // Quick lookup from event id → tour entry (for guest-list views).

@@ -46,20 +46,20 @@ function Overview({ go }) {
   const newSubs = submissions.filter((s) => s.status === "New").length;
   const pendBook = bookings.filter((b) => b.status === "New" || b.status === "Reviewing").length;
   const inner = fans.filter((f) => f.tier === "Inner Circle").length;
+  const countries = new Set(fans.map((f) => f.country).filter(Boolean)).size;
   const feed = [
     ...submissions.slice(0, 4).map((s) => ({ ic: "music", t: <><b>{s.artist}</b> submitted “{s.track}”</>, d: `${s.genre} · ${fmtDate(s.date)}`, _d: s.date })),
     ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> — {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
     ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{eventById[g.eventId] ? ` — ${eventById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
     ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " — Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
   ].sort((a, b) => (a._d < b._d ? 1 : -1)).slice(0, 8);
-  const growth = [62, 70, 58, 88, 96, 110, 134, 128, 156, 172, 198, 240];
-  const months = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
-  const mx = Math.max(...growth);
+  const pipeline = [["Submissions", submissions.length], ["Bookings", bookings.length], ["Guest list", guestlist.length], ["Subscribers", fans.length]];
+  const pmax = Math.max(1, ...pipeline.map((p) => p[1]));
   const cards = [
-    { ic: "inbox", n: newSubs, l: "New submissions", d: <span className="up"><Icon name="trend" size={12} /> {submissions.length} total in queue</span>, go: "submissions" },
-    { ic: "calendar", n: pendBook, l: "Open bookings", d: <span className="up"><Icon name="trend" size={12} /> {bookings.length} inquiries</span>, go: "bookings" },
-    { ic: "users", n: fanTotal.toLocaleString(), l: "Audience", d: <span className="up"><Icon name="trend" size={12} /> +18% this month</span>, go: "audience" },
-    { ic: "star", n: inner + 1842, l: "Inner Circle", d: <span className="up"><Icon name="trend" size={12} /> paid tier</span>, go: "audience" },
+    { ic: "inbox", n: newSubs, l: "New submissions", d: `${submissions.length} total in queue`, go: "submissions" },
+    { ic: "calendar", n: pendBook, l: "Open bookings", d: `${bookings.length} total`, go: "bookings" },
+    { ic: "users", n: fanTotal.toLocaleString(), l: "Subscribers", d: countries ? `${countries} ${countries === 1 ? "country" : "countries"}` : "—", go: "audience" },
+    { ic: "star", n: inner, l: "Inner Circle", d: "Paid tier", go: "audience" },
   ];
   return (
     <div>
@@ -86,12 +86,12 @@ function Overview({ go }) {
           </div>
         </div>
         <div className="panel">
-          <div className="panel-h"><h3>Audience growth</h3><span className="mono">2026</span></div>
+          <div className="panel-h"><h3>Pipeline</h3><span className="mono">TOTALS</span></div>
           <div className="chart">
             <div className="bars">
-              {growth.map((g, i) => <div className="bar" key={i} style={{ height: `${(g / mx) * 100}%`, background: i === growth.length - 1 ? "var(--accent)" : undefined }}><span>{g}k</span></div>)}
+              {pipeline.map(([l, n], i) => <div className="bar" key={i} style={{ height: `${Math.max(3, (n / pmax) * 100)}%`, background: "var(--accent)" }}><span>{n}</span></div>)}
             </div>
-            <div className="bars-x">{months.map((m, i) => <span key={i}>{m}</span>)}</div>
+            <div className="bars-x">{pipeline.map(([l], i) => <span key={i}>{l}</span>)}</div>
           </div>
         </div>
       </div>
@@ -235,8 +235,14 @@ function Audience({ query }) {
   const { fans, fanTotal } = useStore();
   const [toast, showToast] = useToast();
   const list = fans.filter((f) => !query || (f.name + f.email + f.country).toLowerCase().includes(query.toLowerCase()));
-  const byRegion = [["South Africa", 38], ["Europe", 27], ["Americas", 14], ["Middle East", 11], ["Asia", 10]];
-  const byInterest = [["New music", 92], ["Tour alerts", 78], ["Exclusive mixes", 54], ["Merch drops", 41]];
+  const inner = fans.filter((f) => f.tier === "Inner Circle").length;
+  const countries = new Set(fans.map((f) => f.country).filter(Boolean)).size;
+  // Real breakdowns computed from the loaded subscribers.
+  const pct = (n) => (fans.length ? Math.round((n / fans.length) * 100) : 0);
+  const byCountry = Object.entries(fans.reduce((m, f) => { if (f.country) m[f.country] = (m[f.country] || 0) + 1; return m; }, {}))
+    .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, v]) => [k, pct(v)]);
+  const INTEREST_KEYS = ["New music", "Tour alerts", "Exclusive mixes", "Merch drops"];
+  const byInterest = INTEREST_KEYS.map((i) => [i, pct(fans.filter((f) => (f.interests || []).includes(i)).length)]);
   const exportCsv = () => {
     downloadCsv(`vanco-subscribers-${todayStr()}.csv`, list.map((f) => ({ Name: f.name, Email: f.email, Country: f.country, Interests: (f.interests || []).join("; "), Tier: f.tier, Joined: f.date })));
     showToast(`Exported ${list.length} subscriber${list.length === 1 ? "" : "s"} to CSV.`, { kind: "ok" });
@@ -244,9 +250,9 @@ function Audience({ query }) {
   return (
     <div>
       <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
-        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="users" size={17} /></div></div><div className="sc-n">{fanTotal.toLocaleString()}</div><div className="sc-l">Total subscribers</div><div className="sc-d up"><Icon name="trend" size={12} /> +4,210 this month</div></div>
-        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="star" size={17} /></div></div><div className="sc-n">1,8{fans.filter((f) => f.tier === "Inner Circle").length}2</div><div className="sc-l">Inner Circle (paid)</div><div className="sc-d up"><Icon name="trend" size={12} /> $24/yr</div></div>
-        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="globe" size={17} /></div></div><div className="sc-n">64</div><div className="sc-l">Countries</div><div className="sc-d up"><Icon name="trend" size={12} /> global</div></div>
+        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="users" size={17} /></div></div><div className="sc-n">{fanTotal.toLocaleString()}</div><div className="sc-l">Total subscribers</div></div>
+        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="star" size={17} /></div></div><div className="sc-n">{inner.toLocaleString()}</div><div className="sc-l">Inner Circle (paid)</div></div>
+        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="globe" size={17} /></div></div><div className="sc-n">{countries}</div><div className="sc-l">{countries === 1 ? "Country" : "Countries"}</div></div>
       </div>
       <div className="aud-grid">
         <div className="panel">
@@ -271,8 +277,8 @@ function Audience({ query }) {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div className="panel">
-            <div className="panel-h"><h3>By region</h3></div>
-            {byRegion.map(([r, v]) => <div className="mini-stat" key={r}><span className="ms-l">{r}</span><span className="barline"><span style={{ width: `${v}%` }} /></span><span className="ms-n">{v}%</span></div>)}
+            <div className="panel-h"><h3>By country</h3></div>
+            {byCountry.length ? byCountry.map(([r, v]) => <div className="mini-stat" key={r}><span className="ms-l">{r}</span><span className="barline"><span style={{ width: `${v}%` }} /></span><span className="ms-n">{v}%</span></div>) : <div className="empty" style={{ padding: "28px 18px" }}>No data yet.</div>}
           </div>
           <div className="panel">
             <div className="panel-h"><h3>By interest</h3></div>

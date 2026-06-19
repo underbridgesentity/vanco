@@ -407,7 +407,7 @@ function JoinSection() {
             <div className="feats">
               <div style={{ alignItems: "center" }}>
                 <span className="eqbars" style={{ height: 16 }}><i /><i /><i /><i /></span>
-                <span><b style={{ fontWeight: 700 }}>{fanTotal.toLocaleString()}</b> already in — across 60+ countries</span>
+                <span>{fanTotal > 0 ? <><b style={{ fontWeight: 700 }}>{fanTotal.toLocaleString()}</b> already on the list</> : "Be first to new releases, tickets & exclusive mixes"}</span>
               </div>
             </div>
           </div>
