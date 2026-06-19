@@ -155,7 +155,6 @@ export const SEED = {
 };
 
 // Quick lookup from event id → tour entry (for guest-list views).
-export const tourById = Object.fromEntries(SEED.tour.map((t) => [t.id, t]));
 
 /* ---------- store: API-backed (Neon) with localStorage fallback ----------
    Mode is decided once at startup by probing /api/stats:
@@ -196,10 +195,12 @@ export function StoreProvider({ children }) {
   const [bookings, setBookings] = useState([]);
   const [fans, setFans] = useState([]);
   const [guestlist, setGuestlist] = useState([]);
+  const [events, setEvents] = useState(SEED.tour);
   const [subCount, setSubCount] = useState(0);
 
   const today = () => new Date().toISOString().slice(0, 10);
   const uid = (p) => p + Math.random().toString(36).slice(2, 8);
+  const byDate = (a, b) => (a.date < b.date ? -1 : 1);
 
   async function fetchAdminLists() {
     const [s, b, g, f] = await Promise.all([
@@ -219,12 +220,16 @@ export function StoreProvider({ children }) {
         const stats = await apiJson("/api/stats");
         if (off) return;
         setSubCount(stats.subscribers || 0);
+        // Events are public; fall back to the bundled defaults if the table
+        // isn't there yet, so the Tour section is never empty.
+        try { const ev = await apiJson("/api/events"); if (!off && ev.length) setEvents(ev); } catch {}
         if (localStorage.getItem("vanco_admin")) { try { await fetchAdminLists(); } catch {} }
         if (!off) setMode("api");
       } catch {
         if (off) return;
         const init = loadStore();
         setSubmissions(init.submissions); setBookings(init.bookings); setFans(init.fans); setGuestlist(init.guestlist);
+        setEvents(SEED.tour);
         setMode("local");
       }
     })();
@@ -266,6 +271,27 @@ export function StoreProvider({ children }) {
     setSubmissions(SEED.submissions); setBookings(SEED.bookings); setFans(SEED.fans); setGuestlist(SEED.guestlist);
   };
 
+  // ----- tour events (admin-managed; public reads them) -----
+  const addEvent = async (d) => {
+    if (mode === "api") {
+      try { const row = await apiJson("/api/events", { method: "POST", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify(d) }); setEvents((x) => [...x, row].sort(byDate)); return row; } catch {}
+    }
+    const e = { id: uid("e"), status: "Tickets", cap: 0, ...d };
+    setEvents((x) => [...x, e].sort(byDate));
+    return e;
+  };
+  const updateEvent = async (id, d) => {
+    if (mode === "api") {
+      try { const row = await apiJson("/api/events", { method: "PATCH", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ id, ...d }) }); setEvents((x) => x.map((e) => e.id === id ? row : e).sort(byDate)); return; } catch {}
+    }
+    setEvents((x) => x.map((e) => e.id === id ? { ...e, ...d } : e).sort(byDate));
+  };
+  const deleteEvent = async (id) => {
+    if (mode === "api") apiJson("/api/events", { method: "DELETE", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify({ id }) }).catch(() => {});
+    setEvents((x) => x.filter((e) => e.id !== id));
+  };
+  const eventById = Object.fromEntries(events.map((e) => [e.id, e]));
+
   // Heads approved for an event (sums party sizes), used against each event's cap.
   const approvedFor = (eventId) => guestlist
     .filter((g) => g.eventId === eventId && g.status === "Approved")
@@ -273,7 +299,7 @@ export function StoreProvider({ children }) {
 
   const fanTotal = SEED.fanBase + (mode === "api" ? subCount : fans.length);
 
-  const value = { mode, submissions, bookings, fans, guestlist, fanTotal, loadAdmin, addSubmission, addBooking, addFan, addGuest, setSubStatus, setBookStatus, setGuestStatus, approvedFor, resetAll };
+  const value = { mode, submissions, bookings, fans, guestlist, events, eventById, fanTotal, loadAdmin, addSubmission, addBooking, addFan, addGuest, addEvent, updateEvent, deleteEvent, setSubStatus, setBookStatus, setGuestStatus, approvedFor, resetAll };
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 

@@ -2,7 +2,7 @@
    VANCO — admin app
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, PLATFORMS, useStore, fmtDate, fmtFull, tourById } from "./store.jsx";
+import { Icon, PLATFORMS, useStore, fmtDate, fmtFull } from "./store.jsx";
 import { ASSETS } from "./assets.js";
 
 const AA = { wordW: ASSETS.wordW, monoW: ASSETS.monoW, monoB: ASSETS.monoB };
@@ -27,6 +27,11 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
+/* Labelled form field (reuses the site's .field styles, which read fine on dark). */
+function Fld({ label, full, children }) {
+  return <div className={`field ${full ? "full" : ""}`}><label>{label}</label>{children}</div>;
+}
+
 /* Lightweight transient toast for admin actions. */
 function useToast() {
   const [notice, setNotice] = useState(null);
@@ -37,14 +42,14 @@ function useToast() {
 
 /* ---------- OVERVIEW ---------- */
 function Overview({ go }) {
-  const { submissions, bookings, fans, guestlist, fanTotal } = useStore();
+  const { submissions, bookings, fans, guestlist, eventById, fanTotal } = useStore();
   const newSubs = submissions.filter((s) => s.status === "New").length;
   const pendBook = bookings.filter((b) => b.status === "New" || b.status === "Reviewing").length;
   const inner = fans.filter((f) => f.tier === "Inner Circle").length;
   const feed = [
     ...submissions.slice(0, 4).map((s) => ({ ic: "music", t: <><b>{s.artist}</b> submitted “{s.track}”</>, d: `${s.genre} · ${fmtDate(s.date)}`, _d: s.date })),
     ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> — {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
-    ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{tourById[g.eventId] ? ` — ${tourById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
+    ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{eventById[g.eventId] ? ` — ${eventById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
     ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " — Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
   ].sort((a, b) => (a._d < b._d ? 1 : -1)).slice(0, 8);
   const growth = [62, 70, 58, 88, 96, 110, 134, 128, 156, 172, 198, 240];
@@ -349,6 +354,85 @@ function Settings({ onReset }) {
   );
 }
 
+/* ---------- TOUR (events management) ---------- */
+const EVENT_STATUSES = ["Tickets", "Sold Out", "RSVP", "Announced", "Private"];
+const EVENT_REGIONS = ["Europe", "Africa", "Middle East", "Asia", "Australasia", "Americas"];
+
+function TourAdmin() {
+  const { events, approvedFor } = useStore();
+  const [editing, setEditing] = useState(null);
+  const [toast, showToast] = useToast();
+  const done = (msg) => { showToast(msg, { kind: "ok", icon: "check" }); setEditing(null); };
+  const openNew = () => setEditing({ _new: true });
+  return (
+    <div>
+      <div className="filterbar">
+        <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--amute)", letterSpacing: ".06em" }}>{events.length} DATES · LIVE ON THE SITE</span>
+        <span className="spacer" />
+        <button className="abtn primary" onClick={openNew}><Icon name="plus" size={14} /> Add date</button>
+      </div>
+      <div className="panel">
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead><tr><th>Date</th><th>Venue</th><th>Location</th><th>Region</th><th>Status</th><th>Guest list</th><th></th></tr></thead>
+            <tbody>
+              {events.map((e) => (
+                <tr key={e.id} onClick={() => setEditing(e)}>
+                  <td className="mono">{fmtDate(e.date, { day: "2-digit", month: "short", year: "numeric" })}</td>
+                  <td className="strong">{e.venue}</td>
+                  <td className="muted">{e.city}{e.country ? `, ${e.country}` : ""}</td>
+                  <td className="muted">{e.region}</td>
+                  <td><StatusChip s={e.status} /></td>
+                  <td className="mono muted">{e.cap ? `${approvedFor(e.id)} / ${e.cap}` : "—"}</td>
+                  <td><Icon name="chevron" size={16} style={{ color: "var(--amute)" }} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {events.length === 0 && <div className="empty">No dates yet — add the first show.</div>}
+        </div>
+      </div>
+      {editing && <EventEditor event={editing} onClose={() => setEditing(null)} onDone={done} />}
+      {toast}
+    </div>
+  );
+}
+
+function EventEditor({ event, onClose, onDone }) {
+  const { addEvent, updateEvent, deleteEvent } = useStore();
+  const isNew = !!event._new;
+  const [f, setF] = useState({
+    date: event.date || "", city: event.city || "", country: event.country || "", venue: event.venue || "",
+    region: event.region || "Europe", status: event.status || "Tickets", tickets: event.tickets || "", cap: event.cap ?? 20,
+  });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const save = async (e) => {
+    e.preventDefault();
+    const payload = { ...f, cap: Number(f.cap) || 0 };
+    if (isNew) await addEvent(payload); else await updateEvent(event.id, payload);
+    onDone(isNew ? "Date added — it’s live on the site." : "Date updated.");
+  };
+  const remove = async () => { await deleteEvent(event.id); onDone("Date removed."); };
+  return (
+    <Drawer onClose={onClose} title={isNew ? "New date" : (f.venue || "Edit date")} sub={isNew ? "Add a tour date" : `${f.city}${f.country ? ", " + f.country : ""}`}
+      foot={<>
+        <button className="abtn primary" form="event-form" type="submit"><Icon name="check" size={14} /> {isNew ? "Add date" : "Save changes"}</button>
+        {!isNew && <button className="abtn danger" type="button" onClick={remove}>Delete</button>}
+      </>}>
+      <form id="event-form" className="form-grid" onSubmit={save}>
+        <Fld label="Date"><input required type="date" value={f.date} onChange={set("date")} /></Fld>
+        <Fld label="Guest-list spots"><input type="number" min="0" value={f.cap} onChange={set("cap")} placeholder="0 = none" /></Fld>
+        <Fld label="Venue" full><input required value={f.venue} onChange={set("venue")} placeholder="Venue name" /></Fld>
+        <Fld label="City"><input required value={f.city} onChange={set("city")} placeholder="City" /></Fld>
+        <Fld label="Country code"><input value={f.country} onChange={set("country")} placeholder="e.g. ES" /></Fld>
+        <Fld label="Region"><select value={f.region} onChange={set("region")}>{EVENT_REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}</select></Fld>
+        <Fld label="Status"><select value={f.status} onChange={set("status")}>{EVENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</select></Fld>
+        <Fld label="Ticket link (optional)" full><input value={f.tickets} onChange={set("tickets")} placeholder="https://…" /></Fld>
+      </form>
+    </Drawer>
+  );
+}
+
 /* ---------- GUEST LIST ---------- */
 const GUEST_STATUSES = ["Pending", "Approved", "Waitlist", "Declined"];
 
@@ -370,7 +454,7 @@ async function notifyApproved(g, ev) {
 }
 
 function GuestList({ query }) {
-  const { guestlist, setGuestStatus, approvedFor } = useStore();
+  const { guestlist, setGuestStatus, approvedFor, eventById } = useStore();
   const [filter, setFilter] = useState("All");
   const [open, setOpen] = useState(null);
   const [notice, setNotice] = useState(null);
@@ -384,15 +468,15 @@ function GuestList({ query }) {
   useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(null), 6000); return () => clearTimeout(t); }, [notice]);
   const list = guestlist.filter((g) =>
     (filter === "All" || g.status === filter) &&
-    (!query || (g.name + g.email + (tourById[g.eventId]?.venue || "")).toLowerCase().includes(query.toLowerCase())));
+    (!query || (g.name + g.email + (eventById[g.eventId]?.venue || "")).toLowerCase().includes(query.toLowerCase())));
   const cur = guestlist.find((g) => g.id === open);
-  const ev = cur ? tourById[cur.eventId] : null;
+  const ev = cur ? eventById[cur.eventId] : null;
   const eventsWithReq = [...new Set(guestlist.map((g) => g.eventId))]
-    .map((id) => tourById[id]).filter(Boolean)
+    .map((id) => eventById[id]).filter(Boolean)
     .sort((a, b) => (a.date < b.date ? -1 : 1));
   const exportCsv = () => {
     downloadCsv(`vanco-guestlist-${todayStr()}.csv`, list.map((g) => {
-      const e = tourById[g.eventId] || {};
+      const e = eventById[g.eventId] || {};
       return { Guest: g.name, Email: g.email, Instagram: g.instagram || "", Party: g.guests, Event: e.venue || "", City: e.city || "", "Event date": e.date || "", Requested: g.date, Status: g.status };
     }));
     setNotice({ kind: "ok", msg: `Exported ${list.length} request${list.length === 1 ? "" : "s"} to CSV.` });
@@ -426,7 +510,7 @@ function GuestList({ query }) {
             <thead><tr><th>Guest</th><th>Event</th><th>Party</th><th>Requested</th><th>Status</th><th></th></tr></thead>
             <tbody>
               {list.map((g) => {
-                const e = tourById[g.eventId];
+                const e = eventById[g.eventId];
                 return (
                   <tr key={g.id} className={g._new ? "row-new" : ""} onClick={() => setOpen(g.id)}>
                     <td><div className="cellflex"><span className="tav">{initials(g.name)}</span><div><div className="strong">{g.name}</div><div className="cellsub">{g.email}</div></div></div></td>
@@ -543,7 +627,8 @@ const NAV = [
   ["overview", "Overview", "grid"],
   ["submissions", "Submissions", "inbox"],
   ["bookings", "Bookings", "calendar"],
-  ["guestlist", "Guest List", "pin"],
+  ["tour", "Tour", "pin"],
+  ["guestlist", "Guest List", "star"],
   ["audience", "Audience", "users"],
   ["merch", "Merch", "bag"],
   ["settings", "Settings", "settings"],
@@ -563,6 +648,7 @@ export function AdminApp({ onExit, onLogout }) {
     overview: ["Overview", "Control room — everything at a glance"],
     submissions: ["Submissions", "Promo & demo inbox — A&R for ALGRA"],
     bookings: ["Bookings", "Inbound show & event inquiries"],
+    tour: ["Tour", "Manage the dates shown on the public site"],
     guestlist: ["Guest List", "Per-show guest list — requests & capacity"],
     audience: ["Audience", "The database — fans & subscribers"],
     merch: ["Merch", "Store & product management"],
@@ -604,6 +690,7 @@ export function AdminApp({ onExit, onLogout }) {
           {page === "overview" && <Overview go={go} />}
           {page === "submissions" && <Submissions query={query} />}
           {page === "bookings" && <Bookings query={query} />}
+          {page === "tour" && <TourAdmin />}
           {page === "guestlist" && <GuestList query={query} />}
           {page === "audience" && <Audience query={query} />}
           {page === "merch" && <Merch />}

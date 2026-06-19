@@ -45,6 +45,19 @@ create table if not exists guest_requests (
   created_at  timestamptz not null default now()
 );
 
+create table if not exists events (
+  id          text primary key,
+  event_date  date not null,
+  city        text not null,
+  country     text,
+  venue       text not null,
+  region      text,
+  status      text not null default 'Tickets',
+  tickets     text,
+  cap         int  not null default 0,
+  created_at  timestamptz not null default now()
+);
+
 create table if not exists subscribers (
   id          uuid primary key default gen_random_uuid(),
   name        text,
@@ -60,3 +73,4 @@ create index if not exists bookings_created_idx       on bookings (created_at de
 create index if not exists guest_requests_created_idx on guest_requests (created_at desc);
 create index if not exists guest_requests_event_idx   on guest_requests (event_id);
 create index if not exists subscribers_created_idx    on subscribers (created_at desc);
+create index if not exists events_date_idx            on events (event_date);

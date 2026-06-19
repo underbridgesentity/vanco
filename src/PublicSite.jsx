@@ -2,7 +2,7 @@
    VANCO — public site
    ============================================================ */
 import React, { useState, useEffect } from "react";
-import { Icon, SEED, SPOTIFY, RA_TOUR, SOCIALS, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
+import { Icon, SPOTIFY, RA_TOUR, SOCIALS, useStore, fmtDay, fmtMon, fmtFull, Reveal } from "./store.jsx";
 import { ASSETS as A } from "./assets.js";
 
 const NAVLINKS = [
@@ -114,14 +114,15 @@ function MusicSection() {
 }
 
 /* ---------- TOUR ---------- */
-const REGIONS = ["All", ...Array.from(new Set(SEED.tour.map((t) => t.region)))];
 // Official ticket link where known, otherwise a precise per-event search.
 const ticketUrl = (t) => t.tickets || `https://www.google.com/search?q=${encodeURIComponent(`Vanco ${t.venue} ${t.city} tickets 2026`)}`;
 
 function TourSection() {
+  const { events } = useStore();
   const [reg, setReg] = useState("All");
   const [guestEvent, setGuestEvent] = useState(null);
-  const list = SEED.tour.filter((t) => reg === "All" || t.region === reg);
+  const REGIONS = ["All", ...Array.from(new Set(events.map((t) => t.region).filter(Boolean)))];
+  const list = events.filter((t) => reg === "All" || t.region === reg);
   return (
     <section className="sec dark sec-pad" id="tour" data-screen-label="Tour">
       <div className="wrap">

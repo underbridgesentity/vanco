@@ -105,7 +105,13 @@ The app talks to serverless API functions backed by **Neon (serverless Postgres)
 | --- | --- | --- |
 | `DATABASE_URL` | yes (for live data) | Neon connection string |
 
-API routes (`api/`): `submissions`, `bookings`, `guests`, `subscribers` (public `POST`; admin `GET`/`PATCH`), `stats` (public counts), `admin-login`, `notify-guest`.
+API routes (`api/`): `events` (public `GET`, admin `POST`/`PATCH`/`DELETE`), `submissions`, `bookings`, `guests`, `subscribers` (public `POST`; admin `GET`/`PATCH`), `stats` (public counts), `admin-login`, `notify-guest`.
+
+### Tour dates
+
+Tour dates live in the `events` table and are managed from the admin **Tour** page (add / edit / delete date, venue, city, country, region, status, ticket link, and guest-list capacity). The public Tour section reads them, and each guest-list request links to its event. On first read, `api/events` auto-seeds the 2026 dates if the table is empty.
+
+> If you set up the database before this feature existed, re-run [`schema.sql`](schema.sql) once (it's idempotent — `create table if not exists`) to add the `events` table, then redeploy.
 
 > Auth note: admin access still uses the shared passcode + signed session. For per-person team logins, add an auth provider (e.g. Clerk) in front of the admin — the API functions already verify a session, so that's a drop-in upgrade.
 
