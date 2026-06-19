@@ -391,7 +391,7 @@ function BookSection() {
 const INTERESTS = ["Tour alerts", "New music", "Exclusive mixes", "Merch drops"];
 function JoinSection() {
   const { addFan, fanTotal } = useStore();
-  const [f, setF] = useState({ name: "", email: "", country: "", tier: "Free", interests: ["New music", "Tour alerts"] });
+  const [f, setF] = useState({ name: "", email: "", country: "", interests: ["New music", "Tour alerts"] });
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const toggle = (i) => setF({ ...f, interests: f.interests.includes(i) ? f.interests.filter((x) => x !== i) : [...f.interests, i] });
@@ -402,8 +402,8 @@ function JoinSection() {
         <Reveal className="split">
           <div className="lhs">
             <div className="idx kicker" style={{ marginBottom: 16, opacity: .55 }}>(06) - The List</div>
-            <h3>Join the<br />inner circle</h3>
-            <p>One signal cuts through the noise. Get tour tickets before anyone, unreleased music, exclusive mixes and first dibs on merch.</p>
+            <h3>Join the<br />list</h3>
+            <p>Free, always. Get tour tickets before anyone, unreleased music, exclusive mixes and first dibs on merch.</p>
             <div className="feats">
               <div style={{ alignItems: "center" }}>
                 <span className="eqbars" style={{ height: 16 }}><i /><i /><i /><i /></span>
@@ -412,17 +412,9 @@ function JoinSection() {
             </div>
           </div>
           <div className="rhs">
-            {sent ? <Sent title="You’re in" msg={`Welcome to the inner circle. ${f.tier === "Inner Circle" ? "Your exclusive mixes and early access are unlocked." : "Watch your inbox for first access to tickets and new music."}`} onReset={() => { setSent(false); setF({ name: "", email: "", country: "", tier: "Free", interests: ["New music", "Tour alerts"] }); }} />
+            {sent ? <Sent title="You’re in" msg="Welcome in. Watch your inbox for first access to tickets and new music." onReset={() => { setSent(false); setF({ name: "", email: "", country: "", interests: ["New music", "Tour alerts"] }); }} />
               : (
                 <form onSubmit={submit}>
-                  <div className="tiers">
-                    {[["Free", "Newsletter · tickets & music"], ["Inner Circle", "Exclusive mixes & content"]].map(([t, d]) => (
-                      <div key={t} className={`tier ${f.tier === t ? "on" : ""}`} onClick={() => setF({ ...f, tier: t })}>
-                        <div className="tn">{t}<span className="tradio" /></div>
-                        <div className="tp">{d}</div>
-                      </div>
-                    ))}
-                  </div>
                   <div className="form-grid">
                     <Field label="Name"><input required value={f.name} onChange={set("name")} placeholder="Your name" /></Field>
                     <Field label="Country"><input required value={f.country} onChange={set("country")} placeholder="Where you’re based" /></Field>
@@ -434,8 +426,8 @@ function JoinSection() {
                     </Field>
                   </div>
                   <div className="form-foot">
-                    <span className="form-note">No spam · leave anytime</span>
-                    <button className="btn btn-fill btn-lg" type="submit">{f.tier === "Inner Circle" ? "Join Inner Circle" : "Join the list"} <Icon name="arrowR" size={15} className="mv" /></button>
+                    <span className="form-note">Free · no spam · leave anytime</span>
+                    <button className="btn btn-fill btn-lg" type="submit">Join the list <Icon name="arrowR" size={15} className="mv" /></button>
                   </div>
                 </form>
               )}
@@ -479,7 +471,7 @@ function FooterSubscribe() {
   const submit = (e) => {
     e.preventDefault();
     if (!email) return;
-    addFan({ name: email.split("@")[0], email, country: "", tier: "Free", interests: ["New music", "Tour alerts"] });
+    addFan({ name: email.split("@")[0], email, country: "", interests: ["New music", "Tour alerts"] });
     setDone(true);
   };
   if (done) return <div className="foot-subbed"><Icon name="check" size={15} /> You’re on the list. Watch your inbox.</div>;

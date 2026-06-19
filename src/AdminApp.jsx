@@ -45,13 +45,13 @@ function Overview({ go }) {
   const { submissions, bookings, fans, guestlist, eventById, fanTotal } = useStore();
   const newSubs = submissions.filter((s) => s.status === "New").length;
   const pendBook = bookings.filter((b) => b.status === "New" || b.status === "Reviewing").length;
-  const inner = fans.filter((f) => f.tier === "Inner Circle").length;
+  const pendGuests = guestlist.filter((g) => g.status === "Pending").length;
   const countries = new Set(fans.map((f) => f.country).filter(Boolean)).size;
   const feed = [
     ...submissions.slice(0, 4).map((s) => ({ ic: "music", t: <><b>{s.artist}</b> submitted “{s.track}”</>, d: `${s.genre} · ${fmtDate(s.date)}`, _d: s.date })),
     ...bookings.slice(0, 3).map((b) => ({ ic: "calendar", t: <><b>{b.org || b.name}</b> - {b.event}</>, d: `${b.type} · ${b.city}`, _d: b.created })),
     ...guestlist.slice(0, 3).map((g) => ({ ic: "pin", t: <><b>{g.name}</b> requested guest list{eventById[g.eventId] ? ` - ${eventById[g.eventId].venue}` : ""}</>, d: `${g.guests} ${g.guests > 1 ? "people" : "person"} · ${fmtDate(g.date)}`, _d: g.date })),
-    ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined{f.tier === "Inner Circle" ? " - Inner Circle" : ""}</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
+    ...fans.slice(0, 3).map((f) => ({ ic: "users", t: <><b>{f.name}</b> joined the list</>, d: `${f.country} · ${fmtDate(f.date)}`, _d: f.date })),
   ].sort((a, b) => (a._d < b._d ? 1 : -1)).slice(0, 8);
   const pipeline = [["Submissions", submissions.length], ["Bookings", bookings.length], ["Guest list", guestlist.length], ["Subscribers", fans.length]];
   const pmax = Math.max(1, ...pipeline.map((p) => p[1]));
@@ -59,7 +59,7 @@ function Overview({ go }) {
     { ic: "inbox", n: newSubs, l: "New submissions", d: `${submissions.length} total in queue`, go: "submissions" },
     { ic: "calendar", n: pendBook, l: "Open bookings", d: `${bookings.length} total`, go: "bookings" },
     { ic: "users", n: fanTotal.toLocaleString(), l: "Subscribers", d: countries ? `${countries} ${countries === 1 ? "country" : "countries"}` : "-", go: "audience" },
-    { ic: "star", n: inner, l: "Inner Circle", d: "Paid tier", go: "audience" },
+    { ic: "star", n: pendGuests, l: "Guest requests", d: `${guestlist.length} total`, go: "guestlist" },
   ];
   return (
     <div>
@@ -235,8 +235,9 @@ function Audience({ query }) {
   const { fans, fanTotal } = useStore();
   const [toast, showToast] = useToast();
   const list = fans.filter((f) => !query || (f.name + f.email + f.country).toLowerCase().includes(query.toLowerCase()));
-  const inner = fans.filter((f) => f.tier === "Inner Circle").length;
   const countries = new Set(fans.map((f) => f.country).filter(Boolean)).size;
+  const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+  const recent = fans.filter((f) => (f.date || "") >= weekAgo).length;
   // Real breakdowns computed from the loaded subscribers.
   const pct = (n) => (fans.length ? Math.round((n / fans.length) * 100) : 0);
   const byCountry = Object.entries(fans.reduce((m, f) => { if (f.country) m[f.country] = (m[f.country] || 0) + 1; return m; }, {}))
@@ -244,14 +245,14 @@ function Audience({ query }) {
   const INTEREST_KEYS = ["New music", "Tour alerts", "Exclusive mixes", "Merch drops"];
   const byInterest = INTEREST_KEYS.map((i) => [i, pct(fans.filter((f) => (f.interests || []).includes(i)).length)]);
   const exportCsv = () => {
-    downloadCsv(`vanco-subscribers-${todayStr()}.csv`, list.map((f) => ({ Name: f.name, Email: f.email, Country: f.country, Interests: (f.interests || []).join("; "), Tier: f.tier, Joined: f.date })));
+    downloadCsv(`vanco-subscribers-${todayStr()}.csv`, list.map((f) => ({ Name: f.name, Email: f.email, Country: f.country, Interests: (f.interests || []).join("; "), Joined: f.date })));
     showToast(`Exported ${list.length} subscriber${list.length === 1 ? "" : "s"} to CSV.`, { kind: "ok" });
   };
   return (
     <div>
       <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
         <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="users" size={17} /></div></div><div className="sc-n">{fanTotal.toLocaleString()}</div><div className="sc-l">Total subscribers</div></div>
-        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="star" size={17} /></div></div><div className="sc-n">{inner.toLocaleString()}</div><div className="sc-l">Inner Circle (paid)</div></div>
+        <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="trend" size={17} /></div></div><div className="sc-n">{recent.toLocaleString()}</div><div className="sc-l">New this week</div></div>
         <div className="statcard"><div className="sc-top"><div className="ic"><Icon name="globe" size={17} /></div></div><div className="sc-n">{countries}</div><div className="sc-l">{countries === 1 ? "Country" : "Countries"}</div></div>
       </div>
       <div className="aud-grid">
@@ -259,14 +260,13 @@ function Audience({ query }) {
           <div className="panel-h"><h3>Subscribers</h3><button className="abtn ghost" onClick={exportCsv} disabled={!list.length}><Icon name="download" size={14} /> Export CSV</button></div>
           <div className="tbl-wrap">
             <table className="tbl">
-              <thead><tr><th>Name</th><th>Country</th><th>Interests</th><th>Tier</th><th>Joined</th></tr></thead>
+              <thead><tr><th>Name</th><th>Country</th><th>Interests</th><th>Joined</th></tr></thead>
               <tbody>
                 {list.map((f) => (
                   <tr key={f.id} className={f._new ? "row-new" : ""}>
                     <td><div className="cellflex"><span className="tav">{initials(f.name)}</span><div><div className="strong">{f.name}</div><div className="cellsub">{f.email}</div></div></div></td>
                     <td className="muted">{f.country}</td>
-                    <td className="muted" style={{ fontSize: 12 }}>{f.interests.join(", ")}</td>
-                    <td><span className={`sc ${f.tier === "Inner Circle" ? "inner" : "free"}`}>{f.tier}</span></td>
+                    <td className="muted" style={{ fontSize: 12 }}>{(f.interests || []).join(", ")}</td>
                     <td className="mono muted">{fmtDate(f.date)}</td>
                   </tr>
                 ))}
