@@ -89,6 +89,8 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 .nav.scrolled { background: rgba(5,5,6,.9); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line-d-soft); }
 /* adaptive: over light sections */
 .nav.on-light { background: rgba(255,255,255,.94); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line-l-soft); }
+/* over the (light) hero at the top: keep it transparent but dark-on-light */
+.nav.on-hero.on-light { background: transparent; backdrop-filter: none; border-bottom-color: transparent; }
 .nav.on-light .nav-links a { color: var(--mute-l); }
 .nav.on-light .nav-links a:hover, .nav.on-light .nav-links a.active { color: #000; }
 .nav.on-light .nav-admin { color: var(--mute-l); }
@@ -121,23 +123,25 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 /* =========================================================
    HERO
    ========================================================= */
-.hero { min-height: 100svh; position: relative; display: flex; align-items: flex-end; overflow: hidden; background: var(--void); }
-/* Full-bleed cinematic background. The portrait is vertical, so on wide screens
-   cover crops it to a band and centres the subject horizontally - the gradient
-   darkens the left so the headline stays legible over the image. */
+.hero { min-height: 100svh; position: relative; display: flex; align-items: flex-end; overflow: hidden; background: #c7d2dc; }
+/* Bright, airy hero: Vanco on the right against open sky, dark text on the
+   light left. The 16:9 photo fills a widescreen hero with minimal cropping. */
 .hero-bg { position: absolute; inset: 0; z-index: 0; }
-.hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 68% 22%; opacity: .95; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }
 .hero-bg::after { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(5,5,6,.5) 0%, rgba(5,5,6,.06) 28%, rgba(5,5,6,.32) 60%, rgba(5,5,6,.98) 100%),
-              linear-gradient(90deg, rgba(5,5,6,.94) 0%, rgba(5,5,6,.6) 38%, rgba(5,5,6,.08) 72%, transparent 100%); }
-.hero-mono { position: absolute; z-index: 1; right: -4%; top: 8%; width: 44%; max-width: 620px; opacity: .05; pointer-events: none; }
+  background: linear-gradient(90deg, rgba(244,246,248,.5) 0%, rgba(244,246,248,.14) 30%, transparent 54%),
+              linear-gradient(0deg, rgba(244,246,248,.55) 0%, transparent 22%); }
+.hero-mono { position: absolute; z-index: 1; left: 1%; bottom: 12%; width: 32%; max-width: 440px; opacity: .045; pointer-events: none; }
 .hero-in { position: relative; z-index: 2; width: 100%; max-width: 1480px; margin: 0 auto; padding: 120px 40px 64px; }
-@media (max-width: 700px) { .hero-bg img { object-position: 64% 15%; } }
-.hero-kick { display: flex; align-items: center; gap: 14px; color: var(--mute-d); margin-bottom: 26px; }
-.hero-kick .dotsep { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
-.hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: .94; font-size: clamp(40px, 6.4vw, 104px); text-transform: uppercase; max-width: 8ch; }
-.hero h1 .o { color: transparent; -webkit-text-stroke: 1.5px #fff; }
-.hero-sub { margin-top: 24px; max-width: 480px; font-size: clamp(15px,1.4vw,19px); line-height: 1.5; color: rgba(255,255,255,.82); font-weight: 400; }
+.hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: .94; font-size: clamp(40px, 6.4vw, 104px); text-transform: uppercase; max-width: 8ch; color: #0c0c0e; }
+.hero h1 .o { color: transparent; -webkit-text-stroke: 1.6px #0c0c0e; }
+.hero-sub { margin-top: 24px; max-width: 480px; font-size: clamp(15px,1.4vw,19px); line-height: 1.5; color: rgba(12,12,14,.72); font-weight: 400; }
+/* Mobile/tablet: a landscape photo crops to a slice, so frame his face up top
+   and whiten the lower area where the text sits so the dark copy stays legible. */
+@media (max-width: 900px) {
+  .hero-bg img { object-position: 62% 16%; }
+  .hero-bg::after { background: linear-gradient(0deg, rgba(244,246,248,.94) 0%, rgba(244,246,248,.6) 32%, rgba(244,246,248,.05) 62%, transparent 78%); }
+}
 .hero-cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 .hero-foot { position: absolute; z-index: 2; bottom: 26px; right: 40px; display: flex; align-items: center; gap: 18px; color: var(--mute-d); font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 @media (max-width: 720px){ .hero-foot{ display:none; } .hero-bg img{ object-position: 64% 28%; } }

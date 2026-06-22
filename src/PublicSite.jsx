@@ -32,7 +32,7 @@ function Nav({ active }) {
   const go = (id) => { setOpen(false); document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }); };
   return (
     <>
-      <nav className={`nav ${onHero ? "" : "scrolled"} ${onLight ? "on-light" : ""}`}>
+      <nav className={`nav ${onHero ? "on-hero" : "scrolled"} ${onLight ? "on-light" : ""}`}>
         <div className="nav-in">
           <a className="nav-logo" href="#top" onClick={(e) => { e.preventDefault(); go("top"); }}>
             <img src={onLight ? A.wordB : A.wordW} alt="VANCO" />
@@ -64,14 +64,14 @@ function Nav({ active }) {
 /* ---------- HERO ---------- */
 function Hero({ onPlay, heroImg }) {
   return (
-    <header className="hero" id="top" data-screen-label="Hero">
-      <div className="hero-bg"><img src={heroImg || A.blue} alt="Vanco" /></div>
-      <img className="hero-mono" src={A.monoW} alt="" aria-hidden="true" />
+    <header className="hero light" id="top" data-screen-label="Hero">
+      <div className="hero-bg"><img src={heroImg || A.hero} alt="Vanco" /></div>
+      <img className="hero-mono" src={A.monoB} alt="" aria-hidden="true" />
       <div className="hero-in">
         <h1>Rhythm<br />without<br /><span className="o">borders</span></h1>
         <p className="hero-sub">DJ and producer blending Afro house, melodic techno and tribal electronic rhythms, rooted in African spirit and designed for every dancefloor on earth.</p>
         <div className="hero-cta">
-          <button className="btn btn-fill btn-lg" onClick={onPlay}>
+          <button className="btn btn-fill on-light btn-lg" onClick={onPlay}>
             <Icon name="play" size={15} /> Play latest
           </button>
         </div>

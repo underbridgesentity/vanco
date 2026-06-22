@@ -59,7 +59,7 @@ function Root() {
     <StoreProvider>
       <div className="view-fade" key={`${view}-${authed}`}>
         {view === "site"
-          ? <PublicSite heroImg={ASSETS.blue} />
+          ? <PublicSite heroImg={ASSETS.hero} />
           : authed
             ? <AdminApp onExit={goSite} onLogout={logout} />
             : <AdminLogin onSuccess={login} onCancel={goSite} />}

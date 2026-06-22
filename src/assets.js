@@ -6,6 +6,7 @@ import wordWhite from "./assets/word-white.png";
 import wordBlack from "./assets/word-black.png";
 import portraitBlue from "./assets/portrait-blue.png";
 import portraitHat from "./assets/portrait-hat.jpg";
+import heroSky from "./assets/hero.png";
 
 export const ASSETS = {
   monoW: monoWhite,
@@ -14,6 +15,7 @@ export const ASSETS = {
   wordB: wordBlack,
   blue: portraitBlue,
   hat: portraitHat,
+  hero: heroSky,
 };
 
 export const HERO_IMG = {
