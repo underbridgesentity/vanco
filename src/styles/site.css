@@ -136,11 +136,21 @@ section[data-screen-label] { scroll-margin-top: 76px; }
 .hero h1 { font-weight: 700; letter-spacing: -.03em; line-height: .94; font-size: clamp(40px, 6.4vw, 104px); text-transform: uppercase; max-width: 8ch; color: #0c0c0e; }
 .hero h1 .o { color: transparent; -webkit-text-stroke: 1.6px #0c0c0e; }
 .hero-sub { margin-top: 24px; max-width: 480px; font-size: clamp(15px,1.4vw,19px); line-height: 1.5; color: rgba(12,12,14,.72); font-weight: 400; }
-/* Mobile/tablet: a landscape photo crops to a slice, so frame his face up top
-   and whiten the lower area where the text sits so the dark copy stays legible. */
+/* Tablet: the landscape photo crops to a slice, so frame his face and whiten
+   the lower area where the text sits so the dark copy stays legible. */
 @media (max-width: 900px) {
   .hero-bg img { object-position: 62% 16%; }
   .hero-bg::after { background: linear-gradient(0deg, rgba(244,246,248,.94) 0%, rgba(244,246,248,.6) 32%, rgba(244,246,248,.05) 62%, transparent 78%); }
+}
+/* Phone: stack it - photo as a band up top (his face), text on the sky panel
+   below, so the headline never sits over the busy shirt. */
+@media (max-width: 700px) {
+  .hero { flex-direction: column; align-items: stretch; min-height: auto; }
+  .hero-bg { position: relative; inset: auto; height: 50svh; flex: none; }
+  .hero-bg img { object-position: 64% 14%; }
+  .hero-bg::after { background: linear-gradient(0deg, #c7d2dc 0%, rgba(199,210,220,.5) 13%, transparent 30%); }
+  .hero-mono { display: none; }
+  .hero-in { padding: 32px 22px 48px; }
 }
 .hero-cta { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 .hero-foot { position: absolute; z-index: 2; bottom: 26px; right: 40px; display: flex; align-items: center; gap: 18px; color: var(--mute-d); font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
